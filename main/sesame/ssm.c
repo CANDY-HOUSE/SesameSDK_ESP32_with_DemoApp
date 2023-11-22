@@ -89,6 +89,29 @@ void ssm_say_handler(const uint8_t * p_data, uint16_t len, uint8_t conn_id) {
     }
 }
 
+uint8_t tag_esp32[] = { 'S', 'E', 'S', 'A', 'M', 'E', ' ', 'E', 'S', 'P', '3', '2' };
+static void ssm_lock(sesame * ssm, uint8_t * tag, uint8_t tag_length) {
+    ESP_LOGI(TAG, "[ssm][lock][ssm->device_status: %d]", ssm->device_status);
+    if (ssm->device_status >= SSM_LOGGIN) {
+        if (tag_length == 0) {
+            ss5_lock(ssm, tag_esp32, sizeof(tag_esp32));
+        } else {
+            ss5_lock(ssm, tag, tag_length);
+        }
+    }
+}
+
+static void ssm_unlock(sesame * ssm, uint8_t * tag, uint8_t tag_length) {
+    ESP_LOGI(TAG, "[ssm][unlock][ssm->device_status: %d]", ssm->device_status);
+    if (ssm->device_status >= SSM_LOGGIN) {
+        if (tag_length == 0) {
+            ss5_unlock(ssm, tag_esp32, sizeof(tag_esp32));
+        } else {
+            ss5_unlock(ssm, tag, tag_length);
+        }
+    }
+}
+
 void ssm_unlock_all(uint8_t * tag, uint8_t tag_length) {
     ESP_LOGI(TAG, "[ssm][ssm_unlock_all]");
     for (int i = 0; i < SSM_MAX_NUM; ++i) {
@@ -110,29 +133,6 @@ void ssm_toggle_all(uint8_t * tag, uint8_t tag_length) {
             ssm_unlock_all(tag, tag_length);
         } else if (p_ssms_env->ssm[i].device_status == SSM_UNLOCKED) {
             ssm_lock_all(tag, tag_length);
-        }
-    }
-}
-
-uint8_t tag_esp32[] = { 'S', 'E', 'S', 'A', 'M', 'E', ' ', 'E', 'S', 'P', '3', '2' };
-void ssm_lock(sesame * ssm, uint8_t * tag, uint8_t tag_length) {
-    ESP_LOGI(TAG, "[ssm][lock][ssm->device_status: %d]", ssm->device_status);
-    if (ssm->device_status >= SSM_LOGGIN) {
-        if (tag_length == 0) {
-            ss5_lock(ssm, tag_esp32, sizeof(tag_esp32));
-        } else {
-            ss5_lock(ssm, tag, tag_length);
-        }
-    }
-}
-
-void ssm_unlock(sesame * ssm, uint8_t * tag, uint8_t tag_length) {
-    ESP_LOGI(TAG, "[ssm][unlock][ssm->device_status: %d]", ssm->device_status);
-    if (ssm->device_status >= SSM_LOGGIN) {
-        if (tag_length == 0) {
-            ss5_unlock(ssm, tag_esp32, sizeof(tag_esp32));
-        } else {
-            ss5_unlock(ssm, tag, tag_length);
         }
     }
 }

@@ -58,10 +58,6 @@ extern struct ssm_env_tag * p_ssms_env;
 
 void ssm_init(ssm_action ssm_action_cb);
 
-void ssm_lock(sesame * ssm, uint8_t * tag, uint8_t tag_length);
-
-void ssm_unlock(sesame * ssm, uint8_t * tag, uint8_t tag_length);
-
 void ssm_unlock_all(uint8_t * tag, uint8_t tag_length);
 
 void ssm_lock_all(uint8_t * tag, uint8_t tag_length);
