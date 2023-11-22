@@ -11,25 +11,24 @@ extern "C" {
 
 #define SSM_MAX_NUM (4u)
 
-#define SSM_KEY_LENGTH (offsetof(sesame, addr) + 6)
 #pragma pack(1)
 
 typedef struct {
     int64_t count;
     uint8_t nouse;
     uint8_t tk_app_ssm[4];
-} SS5_CCM_NONCE;
+} SSM_CCM_NONCE;
 
 extern uint8_t additional_data[];
 
 typedef struct {
     uint8_t ccm_key[16];
-    SS5_CCM_NONCE encrypt;
-    SS5_CCM_NONCE decrypt;
-} Sesame5BleCipher;
+    SSM_CCM_NONCE encrypt;
+    SSM_CCM_NONCE decrypt;
+} SesameBleCipher;
 
 union ssm_cipher {
-    Sesame5BleCipher ss5;
+    SesameBleCipher ss5;
 };
 
 typedef struct {
