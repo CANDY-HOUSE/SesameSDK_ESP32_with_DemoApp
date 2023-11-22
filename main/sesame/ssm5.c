@@ -54,14 +54,6 @@ void ss5_unlock(sesame * ssm, uint8_t * tag, uint8_t tag_len) {
     talk_to_ssm(ssm, SSM_SEG_PARSING_TYPE_CIPHERTEXT);
 }
 
-void ss5_toggle(sesame * ssm, uint8_t * tag, uint8_t tag_len) {
-    if (ssm->device_status == SSM_LOCKED) {
-        ss5_unlock(ssm, tag, tag_len);
-    } else {
-        ss5_lock(ssm, tag, tag_len);
-    }
-}
-
 void ss5_readHistoryCommand(sesame * ssm) {
     ESP_LOGI(TAG, "[readHistoryCommand]");
     ssm->c_offset = 2;
