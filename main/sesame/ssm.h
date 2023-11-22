@@ -19,8 +19,6 @@ typedef struct {
     uint8_t tk_app_ssm[4];
 } SSM_CCM_NONCE;
 
-extern uint8_t additional_data[];
-
 typedef struct {
     uint8_t ccm_key[16];
     SSM_CCM_NONCE encrypt;
@@ -63,8 +61,6 @@ void ssm_disconnect(sesame * ssm);
 void ssm_say_handler(const uint8_t * p_data, uint16_t len, uint8_t conn_id);
 
 void talk_to_ssm(sesame * ssm, uint8_t parsing_type);
-
-void add_ssm(uint8_t * addr);
 
 #ifdef __cplusplus
 }

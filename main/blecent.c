@@ -159,7 +159,13 @@ static void blecent_connect_sesame(const struct ble_hs_adv_fields * fields, void
         if (fields->mfg_data[4] == 0x00) {                            // unregistered SSM
             ESP_LOGI(TAG, "find unregistered SSM[%d]", fields->mfg_data[2]);
             ESP_LOG_BUFFER_HEX_LEVEL("find SSM", addr->val, 6, ESP_LOG_INFO);
-            add_ssm(addr->val);
+            for (int i = 0; i < SSM_MAX_NUM; ++i) {
+                if (p_ssms_env->ssm[i].device_status == SSM_NOUSE) {
+                    memcpy(p_ssms_env->ssm[i].addr, addr->val, 6);
+                    p_ssms_env->ssm[i].device_status = SSM_DISCONNECTED;
+                    p_ssms_env->ssm[i].conn_id       = 0xFF;
+                }
+            }
         } else { // registered SSM
             ESP_LOGW(TAG, "find registered SSM[%d]", fields->mfg_data[2]);
             return;
