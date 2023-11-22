@@ -147,33 +147,19 @@ void ssm_ble_receiver(sesame * ssm, const uint8_t * p_data, uint16_t len) {
     ssm->c_offset = 0;
 }
 
-void ssm_lock_tag(sesame * ssm, uint8_t * tag, uint8_t tag_len) {
-    ESP_LOGI(TAG, "[ssm][lock][tag_len: %d][tag: %s]", tag_len, tag);
-    ssm->c_offset = tag_len + 2;
-    ssm->b_buf[0] = SSM_ITEM_CODE_LOCK;
-    ssm->b_buf[1] = tag_len;
-    memcpy(ssm->b_buf + 2, tag, tag_len);
-    talk_to_ssm(ssm, SSM_SEG_PARSING_TYPE_CIPHERTEXT);
-}
-
-void ssm_unlock_tag(sesame * ssm, uint8_t * tag, uint8_t tag_len) {
-    ESP_LOGI(TAG, "[ssm][unlock][tag_len: %d][tag: %s]", tag_len, tag);
-    ssm->c_offset = tag_len + 2;
-    ssm->b_buf[0] = SSM_ITEM_CODE_UNLOCK;
-    ssm->b_buf[1] = tag_len;
-    memcpy(ssm->b_buf + 2, tag, tag_len);
-    talk_to_ssm(ssm, SSM_SEG_PARSING_TYPE_CIPHERTEXT);
-}
-
 uint8_t tag_esp32[] = { 'S', 'E', 'S', 'A', 'M', 'E', ' ', 'E', 'S', 'P', '3', '2' };
 static void ssm_lock(sesame * ssm, uint8_t * tag, uint8_t tag_length) {
     ESP_LOGI(TAG, "[ssm][lock][ssm->device_status: %d]", ssm->device_status);
     if (ssm->device_status >= SSM_LOGGIN) {
         if (tag_length == 0) {
-            ssm_lock_tag(ssm, tag_esp32, sizeof(tag_esp32));
-        } else {
-            ssm_lock_tag(ssm, tag, tag_length);
+            tag        = tag_esp32;
+            tag_length = sizeof(tag_esp32);
         }
+        ssm->c_offset = tag_length + 2;
+        ssm->b_buf[0] = SSM_ITEM_CODE_LOCK;
+        ssm->b_buf[1] = tag_length;
+        memcpy(ssm->b_buf + 2, tag, tag_length);
+        talk_to_ssm(ssm, SSM_SEG_PARSING_TYPE_CIPHERTEXT);
     }
 }
 
@@ -181,10 +167,14 @@ static void ssm_unlock(sesame * ssm, uint8_t * tag, uint8_t tag_length) {
     ESP_LOGI(TAG, "[ssm][unlock][ssm->device_status: %d]", ssm->device_status);
     if (ssm->device_status >= SSM_LOGGIN) {
         if (tag_length == 0) {
-            ssm_unlock_tag(ssm, tag_esp32, sizeof(tag_esp32));
-        } else {
-            ssm_unlock_tag(ssm, tag, tag_length);
+            tag        = tag_esp32;
+            tag_length = sizeof(tag_esp32);
         }
+        ssm->c_offset = tag_length + 2;
+        ssm->b_buf[0] = SSM_ITEM_CODE_UNLOCK;
+        ssm->b_buf[1] = tag_length;
+        memcpy(ssm->b_buf + 2, tag, tag_length);
+        talk_to_ssm(ssm, SSM_SEG_PARSING_TYPE_CIPHERTEXT);
     }
 }
 
