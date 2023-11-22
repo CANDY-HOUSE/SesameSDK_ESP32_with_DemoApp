@@ -1,10 +1,5 @@
 #include "blecent.h"
-#include "esp_log.h"
-#include "host/ble_hs.h"
-#include "nimble/nimble_port.h"
-#include "nimble/nimble_port_freertos.h"
 #include "nvs_flash.h"
-#include "services/gap/ble_svc_gap.h"
 #include "ssm_cmd.h"
 
 static const char * TAG = "main.c";

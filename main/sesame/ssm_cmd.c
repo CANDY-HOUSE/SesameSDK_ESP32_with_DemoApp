@@ -1,7 +1,5 @@
 #include "ssm_cmd.h"
 #include "aes-cbc-cmac.h"
-#include "c_ccm.h"
-#include "esp_err.h"
 #include "esp_log.h"
 #include "esp_random.h"
 #include "uECC.h"
