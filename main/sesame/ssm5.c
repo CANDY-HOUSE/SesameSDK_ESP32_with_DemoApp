@@ -11,13 +11,13 @@ static const char * TAG = "ssm5.c";
 
 static uint8_t ecc_private_esp32[32];
 
-static void login_sesame5(sesame * ssm) {
+static void login_sesame(sesame * ssm) {
     ESP_LOGI(TAG, "[ssm][login][->]");
-    ssm->b_buf[0] = SSM5_ITEM_CODE_LOGIN;
+    ssm->b_buf[0] = SSM_ITEM_CODE_LOGIN;
     AES_CMAC(ssm->device_secret, (const unsigned char *) ssm->cipher.ss5.decrypt.tk_app_ssm, 4, ssm->cipher.ss5.ccm_key);
     memcpy(&ssm->b_buf[1], ssm->cipher.ss5.ccm_key, 4);
     ssm->c_offset = 5;
-    talk_to_ssm(ssm, SSM5_SEG_PARSING_TYPE_PLAINTEXT);
+    talk_to_ssm(ssm, SSM_SEG_PARSING_TYPE_PLAINTEXT);
 }
 
 static int crypto_backend_micro_ecc_rng_callback(uint8_t * dest, unsigned size) {
@@ -25,33 +25,33 @@ static int crypto_backend_micro_ecc_rng_callback(uint8_t * dest, unsigned size) 
     return 1;
 }
 
-static void register_sesame5(sesame * ssm) {
+static void register_sesame(sesame * ssm) {
     ESP_LOGI(TAG, "[ssm][register][->]");
     uECC_set_rng(crypto_backend_micro_ecc_rng_callback);
     uint8_t ecc_public_esp32[64];
     uECC_make_key_lit(ecc_public_esp32, ecc_private_esp32, uECC_secp256r1());
     ssm->c_offset = sizeof(ecc_public_esp32) + 1;
-    ssm->b_buf[0] = SSM5_ITEM_CODE_REGISTRATION;
+    ssm->b_buf[0] = SSM_ITEM_CODE_REGISTRATION;
     memcpy(ssm->b_buf + 1, ecc_public_esp32, sizeof(ecc_public_esp32));
-    talk_to_ssm(ssm, SSM5_SEG_PARSING_TYPE_PLAINTEXT);
+    talk_to_ssm(ssm, SSM_SEG_PARSING_TYPE_PLAINTEXT);
 }
 
 void ss5_lock(sesame * ssm, uint8_t * tag, uint8_t tag_len) {
     ESP_LOGI(TAG, "[ssm][lock][tag_len: %d][tag: %s]", tag_len, tag);
     ssm->c_offset = tag_len + 2;
-    ssm->b_buf[0] = SSM5_ITEM_CODE_LOCK;
+    ssm->b_buf[0] = SSM_ITEM_CODE_LOCK;
     ssm->b_buf[1] = tag_len;
     memcpy(ssm->b_buf + 2, tag, tag_len);
-    talk_to_ssm(ssm, SSM5_SEG_PARSING_TYPE_CIPHERTEXT);
+    talk_to_ssm(ssm, SSM_SEG_PARSING_TYPE_CIPHERTEXT);
 }
 
 void ss5_unlock(sesame * ssm, uint8_t * tag, uint8_t tag_len) {
     ESP_LOGI(TAG, "[ssm][unlock][tag_len: %d][tag: %s]", tag_len, tag);
     ssm->c_offset = tag_len + 2;
-    ssm->b_buf[0] = SSM5_ITEM_CODE_UNLOCK;
+    ssm->b_buf[0] = SSM_ITEM_CODE_UNLOCK;
     ssm->b_buf[1] = tag_len;
     memcpy(ssm->b_buf + 2, tag, tag_len);
-    talk_to_ssm(ssm, SSM5_SEG_PARSING_TYPE_CIPHERTEXT);
+    talk_to_ssm(ssm, SSM_SEG_PARSING_TYPE_CIPHERTEXT);
 }
 
 void ss5_toggle(sesame * ssm, uint8_t * tag, uint8_t tag_len) {
@@ -65,9 +65,9 @@ void ss5_toggle(sesame * ssm, uint8_t * tag, uint8_t tag_len) {
 void ss5_readHistoryCommand(sesame * ssm) {
     ESP_LOGI(TAG, "[readHistoryCommand]");
     ssm->c_offset = 2;
-    ssm->b_buf[0] = SSM5_ITEM_CODE_HISTORY;
+    ssm->b_buf[0] = SSM_ITEM_CODE_HISTORY;
     ssm->b_buf[1] = 1;
-    talk_to_ssm(ssm, SSM5_SEG_PARSING_TYPE_CIPHERTEXT);
+    talk_to_ssm(ssm, SSM_SEG_PARSING_TYPE_CIPHERTEXT);
 }
 
 static void ssm_initial_handle(sesame * ssm, uint8_t cmd_it_code) {
@@ -88,18 +88,18 @@ static void ssm_initial_handle(sesame * ssm, uint8_t cmd_it_code) {
     ESP_LOGI(TAG, "[ss5][null_ssm_count: %d]", null_ssm_count);
     if (null_ssm_count == SSM_MAX_NUM) { // no device_secret
         ESP_LOGI(TAG, "[ss5][no device_secret]");
-        register_sesame5(ssm);
+        register_sesame(ssm);
         return;
     }
-    login_sesame5(ssm);
+    login_sesame(ssm);
 }
 
 void ss5_parse_publish(sesame * ssm, uint8_t cmd_it_code) {
     ESP_LOGI(TAG, "[ss5_parse_publish][%d]", cmd_it_code);
-    if (cmd_it_code == SSM5_ITEM_CODE_INITIAL) {
+    if (cmd_it_code == SSM_ITEM_CODE_INITIAL) {
         ssm_initial_handle(ssm, cmd_it_code);
     }
-    if (cmd_it_code == SSM5_ITEM_CODE_MECH_STATUS) {
+    if (cmd_it_code == SSM_ITEM_CODE_MECH_STATUS) {
         // ESP_LOG_BUFFER_HEX_LEVEL("MECH_STATUS", ssm->b_buf, 32, ESP_LOG_INFO);
         bool isInLockRange       = (ssm->b_buf[6] & 2u) > 0u;
         bool isInUnlockRange     = (ssm->b_buf[6] & 4u) > 0u;
@@ -117,19 +117,19 @@ void ss5_parse_response(sesame * ssm, uint8_t cmd_it_code) {
     ssm->c_offset = ssm->c_offset - 1;
     memcpy(ssm->b_buf, ssm->b_buf + 1, ssm->c_offset);
 
-    if (cmd_it_code == SSM5_ITEM_CODE_LOGIN) {
+    if (cmd_it_code == SSM_ITEM_CODE_LOGIN) {
         ESP_LOGI(TAG, "[%d][ssm][login][ok]", ssm->conn_id);
         ssm->device_status = SSM_LOGGIN;
         p_ssms_env->ssm_cb__(ssm); // callback: ssm_action_handle
     }
-    if (cmd_it_code == SSM5_ITEM_CODE_HISTORY) {
+    if (cmd_it_code == SSM_ITEM_CODE_HISTORY) {
         ESP_LOGI(TAG, "[%d][ssm][hisdataLength: %d]", ssm->conn_id, ssm->c_offset);
         if (ssm->c_offset == 0) { //循環讀取 避免沒取完歷史
             return;
         }
         ss5_readHistoryCommand(ssm);
     }
-    if (cmd_it_code == SSM5_ITEM_CODE_REGISTRATION) {
+    if (cmd_it_code == SSM_ITEM_CODE_REGISTRATION) {
         ESP_LOGI(TAG, "[%d][ssm][registration][ok]", ssm->conn_id);
         memcpy(ssm->public_key, &ssm->b_buf[13], 64);
         // ESP_LOG_BUFFER_HEX("public_key", ss5->public_key, 64);
@@ -149,10 +149,10 @@ void ss5_ble_receiver(sesame * ssm, const uint8_t * p_data, uint16_t len) {
     }
     memcpy(&ssm->b_buf[ssm->c_offset], p_data + 1, len - 1);
     ssm->c_offset += len - 1;
-    if (p_data[0] >> 1u == SSM5_SEG_PARSING_TYPE_APPEND_ONLY) {
+    if (p_data[0] >> 1u == SSM_SEG_PARSING_TYPE_APPEND_ONLY) {
         return;
     }
-    if (p_data[0] >> 1u == SSM5_SEG_PARSING_TYPE_CIPHERTEXT) {
+    if (p_data[0] >> 1u == SSM_SEG_PARSING_TYPE_CIPHERTEXT) {
         ssm->c_offset = ssm->c_offset - CCM_TAG_LENGTH;
         aes_ccm_auth_decrypt(ssm->cipher.ss5.ccm_key, (const unsigned char *) &ssm->cipher.ss5.decrypt, 13, additional_data, 1, ssm->b_buf, ssm->c_offset, ssm->b_buf, ssm->b_buf + ssm->c_offset, CCM_TAG_LENGTH);
         ssm->cipher.ss5.decrypt.count++;
@@ -167,7 +167,7 @@ void ss5_ble_receiver(sesame * ssm, const uint8_t * p_data, uint16_t len) {
     if (cmd_op_code == SSM5_OP_CODE_PUBLISH) {
         ss5_parse_publish(ssm, cmd_it_code);
     }
-    if (cmd_op_code == SSM5_OP_CODE_RESPONSE) {
+    if (cmd_op_code == SSM_OP_CODE_RESPONSE) {
         ss5_parse_response(ssm, cmd_it_code);
     }
     ssm->c_offset = 0;

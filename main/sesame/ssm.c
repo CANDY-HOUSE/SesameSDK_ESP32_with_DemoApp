@@ -43,7 +43,7 @@ uint8_t additional_data[] = { 0x00 };
 void talk_to_ssm(sesame * ssm, uint8_t parsing_type) {
     ESP_LOGI(TAG, "[%x][talk_to_ssm] => [ssm->c_offset: %d]", ssm->conn_id, ssm->c_offset);
     ESP_LOG_BUFFER_HEX_LEVEL("[esp32][say]", ssm->b_buf, ssm->c_offset, ESP_LOG_INFO);
-    if (parsing_type == SSM5_SEG_PARSING_TYPE_CIPHERTEXT) {
+    if (parsing_type == SSM_SEG_PARSING_TYPE_CIPHERTEXT) {
         aes_ccm_encrypt_and_tag(ssm->cipher.ss5.ccm_key, (const unsigned char *) &ssm->cipher.ss5.encrypt, 13, additional_data, 1, ssm->b_buf, ssm->c_offset, ssm->b_buf, ssm->b_buf + ssm->c_offset, CCM_TAG_LENGTH);
         ssm->cipher.ss5.encrypt.count++;
         ssm->c_offset = ssm->c_offset + CCM_TAG_LENGTH;
