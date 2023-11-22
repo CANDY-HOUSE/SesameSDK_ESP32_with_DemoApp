@@ -142,15 +142,7 @@ static void ssm_parse_response(sesame * ssm, uint8_t cmd_it_code) {
     }
     if (cmd_it_code == SSM_ITEM_CODE_REGISTRATION) {
         ESP_LOGI(TAG, "[%d][ssm][registration][ok]", ssm->conn_id);
-        memcpy(ssm->public_key, &ssm->b_buf[13], 64);
-        // ESP_LOG_BUFFER_HEX("public_key", ss5->public_key, 64);
-        uint8_t ecdh_secret_ss5[32];
-        uECC_shared_secret_lit(ssm->public_key, ecc_private_esp32, ecdh_secret_ss5, uECC_secp256r1());
-        memcpy(ssm->device_secret, ecdh_secret_ss5, 16); // ss5 device_secret
-        ESP_LOG_BUFFER_HEX("deviceSecret", ssm->device_secret, 16);
-        AES_CMAC(ssm->device_secret, (const unsigned char *) ssm->cipher.ss5.decrypt.tk_app_ssm, 4, ssm->cipher.ss5.ccm_key);
-        ssm->device_status = SSM_LOGGIN;
-        p_ssms_env->ssm_cb__(ssm);
+        handle_reg_ssm(ssm);
     }
 }
 

@@ -1,13 +1,11 @@
-#ifndef __SESAME_V5_H__
-#define __SESAME_V5_H__
+#ifndef __SSM_CMD_H__
+#define __SSM_CMD_H__
 
 #include "ssm_link.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-extern uint8_t ecc_private_esp32[32];
 
 void ssm_readHistoryCommand(sesame * ssm);
 
@@ -21,8 +19,10 @@ void login_sesame(sesame * ssm);
 
 void register_sesame(sesame * ssm);
 
+void handle_reg_ssm(sesame * ssm);
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif // __SESAME_V5_H__
+#endif // __SSM_CMD_H__

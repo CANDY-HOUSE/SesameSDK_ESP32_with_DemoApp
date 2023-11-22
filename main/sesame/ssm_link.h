@@ -1,5 +1,5 @@
-#ifndef __SESAME_H__
-#define __SESAME_H__
+#ifndef __SSM_LINK_H__
+#define __SSM_LINK_H__
 
 #include "candy.h"
 #include <stdbool.h>
@@ -66,4 +66,4 @@ void talk_to_ssm(sesame * ssm, uint8_t parsing_type);
 }
 #endif
 
-#endif // __SESAME_H__
+#endif // __SSM_LINK_H__

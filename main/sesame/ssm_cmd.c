@@ -1,14 +1,13 @@
+#include "ssm_cmd.h"
 #include "aes-cbc-cmac.h"
 #include "c_ccm.h"
 #include "esp_err.h"
 #include "esp_log.h"
 #include "esp_random.h"
-#include "ssm_cmd.h"
 #include "uECC.h"
 #include <string.h>
 
-
-static const char * TAG    = "ssm5.c";
+static const char * TAG    = "ssm_cmd.c";
 static uint8_t tag_esp32[] = { 'S', 'E', 'S', 'A', 'M', 'E', ' ', 'E', 'S', 'P', '3', '2' };
 
 uint8_t ecc_private_esp32[32];
@@ -27,6 +26,19 @@ void register_sesame(sesame * ssm) {
     ssm->b_buf[0] = SSM_ITEM_CODE_REGISTRATION;
     memcpy(ssm->b_buf + 1, ecc_public_esp32, sizeof(ecc_public_esp32));
     talk_to_ssm(ssm, SSM_SEG_PARSING_TYPE_PLAINTEXT);
+}
+
+void handle_reg_ssm(sesame * ssm) {
+    ESP_LOGI(TAG, "[ssm][register][<-]");
+    memcpy(ssm->public_key, &ssm->b_buf[13], 64);
+    // ESP_LOG_BUFFER_HEX("public_key", ss5->public_key, 64);
+    uint8_t ecdh_secret_ss5[32];
+    uECC_shared_secret_lit(ssm->public_key, ecc_private_esp32, ecdh_secret_ss5, uECC_secp256r1());
+    memcpy(ssm->device_secret, ecdh_secret_ss5, 16); // ss5 device_secret
+    ESP_LOG_BUFFER_HEX("deviceSecret", ssm->device_secret, 16);
+    AES_CMAC(ssm->device_secret, (const unsigned char *) ssm->cipher.ss5.decrypt.tk_app_ssm, 4, ssm->cipher.ss5.ccm_key);
+    ssm->device_status = SSM_LOGGIN;
+    p_ssms_env->ssm_cb__(ssm);
 }
 
 void login_sesame(sesame * ssm) {
