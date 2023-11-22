@@ -11,16 +11,16 @@ static const char * TAG = "main.c";
 
 static void ssm_action_handle(sesame * ssm) {
     ESP_LOGI(TAG, "ssm_action_handle: %s", SSM_STATUS_STR(ssm->device_status));
-    if (ssm->device_status == SSM5_CONNECTING) {
-        ESP_LOGI(TAG, "ssm->device_status == SSM5_CONNECTING");
-    } else if (ssm->device_status == SSM5_SCANNING) {
-        ESP_LOGI(TAG, "ssm->device_status == SSM5_SCANNING");
-    } else if (ssm->device_status == SSM5_LOGGIN) {
-        ESP_LOGI(TAG, "ssm->device_status == SSM5_LOGGIN");
-    } else if (ssm->device_status == SSM5_LOCKED) {
-        ESP_LOGI(TAG, "ssm->device_status == SSM5_LOCKED");
-    } else if (ssm->device_status == SSM5_UNLOCKED) {
-        ESP_LOGI(TAG, "ssm->device_status == SSM5_UNLOCKED");
+    if (ssm->device_status == SSM_CONNECTING) {
+        ESP_LOGI(TAG, "ssm->device_status == SSM_CONNECTING");
+    } else if (ssm->device_status == SSM_SCANNING) {
+        ESP_LOGI(TAG, "ssm->device_status == SSM_SCANNING");
+    } else if (ssm->device_status == SSM_LOGGIN) {
+        ESP_LOGI(TAG, "ssm->device_status == SSM_LOGGIN");
+    } else if (ssm->device_status == SSM_LOCKED) {
+        ESP_LOGI(TAG, "ssm->device_status == SSM_LOCKED");
+    } else if (ssm->device_status == SSM_UNLOCKED) {
+        ESP_LOGI(TAG, "ssm->device_status == SSM_UNLOCKED");
         ssm_toggle_all(NULL, 0);
     }
 }

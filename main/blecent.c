@@ -90,7 +90,7 @@ static int ble_gap_event_connect_handle(struct ble_gap_event * event, void * arg
         ESP_LOG_BUFFER_HEX_LEVEL("[ssm.addr]", p_ssms_env->ssm[i].addr, 6, ESP_LOG_INFO);
         if (memcmp(p_ssms_env->ssm[i].addr, (*desc).peer_id_addr.val, 6) == 0) {
             ESP_LOGI(TAG, "ssm[%d] connected", i);
-            p_ssms_env->ssm[i].device_status = SSM5_CONNECTED;             // set the device status
+            p_ssms_env->ssm[i].device_status = SSM_CONNECTED;              // set the device status
             p_ssms_env->ssm[i].conn_id       = event->connect.conn_handle; // save the connection handle
             break;
         }

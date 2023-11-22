@@ -21,28 +21,28 @@ typedef enum {
 } candy_product_type;
 
 typedef enum {
-    SSM5_NOUSE        = 0,
-    SSM5_DISCONNECTED = 1,
-    SSM5_SCANNING     = 2,
-    SSM5_CONNECTING   = 3,
-    SSM5_CONNECTED    = 4,
-    SSM5_LOGGIN       = 5,
-    SSM5_LOCKED       = 6,
-    SSM5_UNLOCKED     = 7,
-    SSM5_MOVED        = 8,
+    SSM_NOUSE        = 0,
+    SSM_DISCONNECTED = 1,
+    SSM_SCANNING     = 2,
+    SSM_CONNECTING   = 3,
+    SSM_CONNECTED    = 4,
+    SSM_LOGGIN       = 5,
+    SSM_LOCKED       = 6,
+    SSM_UNLOCKED     = 7,
+    SSM_MOVED        = 8,
 } device_status;
 
 #define SSM_STATUS_STR(status)                                                                                                                                                                                                                                \
-    ((status) == SSM5_NOUSE              ? "NOUSE"                                                                                                                                                                                                            \
-         : (status) == SSM5_DISCONNECTED ? "DISCONNECTED"                                                                                                                                                                                                     \
-         : (status) == SSM5_SCANNING     ? "SCANNING"                                                                                                                                                                                                         \
-         : (status) == SSM5_CONNECTING   ? "CONNECTING"                                                                                                                                                                                                       \
-         : (status) == SSM5_CONNECTED    ? "CONNECTED"                                                                                                                                                                                                        \
-         : (status) == SSM5_LOGGIN       ? "LOGGIN"                                                                                                                                                                                                           \
-         : (status) == SSM5_LOCKED       ? "LOCKED"                                                                                                                                                                                                           \
-         : (status) == SSM5_UNLOCKED     ? "UNLOCKED"                                                                                                                                                                                                         \
-         : (status) == SSM5_MOVED        ? "MOVED"                                                                                                                                                                                                            \
-                                         : "status_error")
+    ((status) == SSM_NOUSE              ? "NOUSE"                                                                                                                                                                                                             \
+         : (status) == SSM_DISCONNECTED ? "DISCONNECTED"                                                                                                                                                                                                      \
+         : (status) == SSM_SCANNING     ? "SCANNING"                                                                                                                                                                                                          \
+         : (status) == SSM_CONNECTING   ? "CONNECTING"                                                                                                                                                                                                        \
+         : (status) == SSM_CONNECTED    ? "CONNECTED"                                                                                                                                                                                                         \
+         : (status) == SSM_LOGGIN       ? "LOGGIN"                                                                                                                                                                                                            \
+         : (status) == SSM_LOCKED       ? "LOCKED"                                                                                                                                                                                                            \
+         : (status) == SSM_UNLOCKED     ? "UNLOCKED"                                                                                                                                                                                                          \
+         : (status) == SSM_MOVED        ? "MOVED"                                                                                                                                                                                                             \
+                                        : "status_error")
 
 typedef enum {
     SSM5_OP_CODE_RESPONSE = 0x07,
