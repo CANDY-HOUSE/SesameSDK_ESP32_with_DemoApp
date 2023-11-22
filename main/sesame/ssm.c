@@ -83,7 +83,7 @@ void ssm_disconnect(sesame * ssm) {
 void ssm_say_handler(const uint8_t * p_data, uint16_t len, uint8_t conn_id) {
     for (int i = 0; i < SSM_MAX_NUM; ++i) {
         if (p_ssms_env->ssm[i].conn_id == conn_id) {
-            ss5_ble_receiver(&p_ssms_env->ssm[i], p_data, len);
+            ssm_ble_receiver(&p_ssms_env->ssm[i], p_data, len);
             break;
         }
     }

@@ -94,8 +94,8 @@ static void ssm_initial_handle(sesame * ssm, uint8_t cmd_it_code) {
     login_sesame(ssm);
 }
 
-void ss5_parse_publish(sesame * ssm, uint8_t cmd_it_code) {
-    ESP_LOGI(TAG, "[ss5_parse_publish][%d]", cmd_it_code);
+static void ssm_parse_publish(sesame * ssm, uint8_t cmd_it_code) {
+    ESP_LOGI(TAG, "[ssm_parse_publish][%d]", cmd_it_code);
     if (cmd_it_code == SSM_ITEM_CODE_INITIAL) {
         ssm_initial_handle(ssm, cmd_it_code);
     }
@@ -113,7 +113,7 @@ void ss5_parse_publish(sesame * ssm, uint8_t cmd_it_code) {
     }
 }
 
-void ss5_parse_response(sesame * ssm, uint8_t cmd_it_code) {
+static void ssm_parse_response(sesame * ssm, uint8_t cmd_it_code) {
     ssm->c_offset = ssm->c_offset - 1;
     memcpy(ssm->b_buf, ssm->b_buf + 1, ssm->c_offset);
 
@@ -143,7 +143,7 @@ void ss5_parse_response(sesame * ssm, uint8_t cmd_it_code) {
     }
 }
 
-void ss5_ble_receiver(sesame * ssm, const uint8_t * p_data, uint16_t len) {
+void ssm_ble_receiver(sesame * ssm, const uint8_t * p_data, uint16_t len) {
     if (p_data[0] & 1u) {
         ssm->c_offset = 0;
     }
@@ -165,10 +165,10 @@ void ss5_ble_receiver(sesame * ssm, const uint8_t * p_data, uint16_t len) {
     // ESP_LOG_BUFFER_HEX("[ssm][say]", ssm->b_buf, ssm->c_offset);
     ESP_LOGI(TAG, "[ssm][op:%x][it:%x]", cmd_op_code, cmd_it_code);
     if (cmd_op_code == SSM_OP_CODE_PUBLISH) {
-        ss5_parse_publish(ssm, cmd_it_code);
+        ssm_parse_publish(ssm, cmd_it_code);
     }
     if (cmd_op_code == SSM_OP_CODE_RESPONSE) {
-        ss5_parse_response(ssm, cmd_it_code);
+        ssm_parse_response(ssm, cmd_it_code);
     }
     ssm->c_offset = 0;
 }
