@@ -59,30 +59,12 @@ typedef enum {
     SSM_ITEM_CODE_DISCONNECT_REBOOT_NOW = 6,
     SSM_ITEM_CODE_ENABLE_DFU            = 7,
     SSM_ITEM_CODE_TIME                  = 8,
-    SSM_ITEM_CODE_BLE_CONNECTION_PARAM  = 9,
-    SSM_ITEM_CODE_BLE_ADV_PARAM         = 10,
-    SSM_ITEM_CODE_AUTOLOCK              = 11,
-    SSM_ITEM_CODE_SERVER_ADV_KICK       = 12,
-    SSM_ITEM_CODE_SESAME_TOKEN          = 13,
     SSM_ITEM_CODE_INITIAL               = 14,
-    SSM_ITEM_CODE_IRER                  = 15,
-    SSM_ITEM_CODE_TIMEPHONE             = 16,
     SSM_ITEM_CODE_MAGNET                = 17,
-    SSM_ITEM_CODE_BLE_ADV_PARAM_GET     = 18, /// nouse
-    SSM_ITEM_CODE_SENSOR_INVERVAL       = 19, /// nouse
-    SSM_ITEM_CODE_SENSOR_INVERVAL_GET   = 20, /// nouse
-
-    SSM_ITEM_CODE_MECH_SETTING = 80,
-    SSM_ITEM_CODE_MECH_STATUS  = 81,
-    SSM_ITEM_CODE_LOCK         = 82,
-    SSM_ITEM_CODE_UNLOCK       = 83,
-    SSM_ITEM_CODE_MOVE_TO,
-    SSM_ITEM_CODE_DRIVE_DIRECTION,
-    SSM_ITEM_CODE_STOP,
-    SSM_ITEM_CODE_DETECT_DIR,
-    SSM_ITEM_CODE_TOGGLE = 88,
-    SSM_ITEM_CODE_CLICK  = 89,
-
+    SSM_ITEM_CODE_MECH_SETTING          = 80,
+    SSM_ITEM_CODE_MECH_STATUS           = 81,
+    SSM_ITEM_CODE_LOCK                  = 82,
+    SSM_ITEM_CODE_UNLOCK                = 83,
 } ssm_item_code_e;
 
 #ifdef __cplusplus
