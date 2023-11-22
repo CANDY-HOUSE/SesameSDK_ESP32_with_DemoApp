@@ -57,7 +57,6 @@ struct ssm_env_tag {
 
 extern struct ssm_env_tag * p_ssms_env;
 
-extern uint8_t * all_key_data;
 
 void ssm_init(ssm_action ssm_action_cb);
 

@@ -14,35 +14,26 @@
 
 static const char * TAG = "ssm.c";
 
-uint8_t * all_key_data = NULL;
-
 struct ssm_env_tag * p_ssms_env = NULL;
 
 void ssm_mem_deinit(void) {
-    free(all_key_data);
     free(p_ssms_env);
 }
 
 static void ssm_mem_init(void) {
-    all_key_data = (uint8_t *) calloc(SSM_MAX_NUM * SSM_KEY_LENGTH * sizeof(uint8_t), MALLOC_CAP_8BIT);
-    if (all_key_data == NULL) {
-        ESP_LOGE(TAG, "[all_key_data][FAIL]");
-    }
-
     p_ssms_env = (struct ssm_env_tag *) malloc(sizeof(struct ssm_env_tag));
     if (p_ssms_env == NULL) {
         ESP_LOGE(TAG, "[p_ssms_env][FAIL]");
     }
+    memset(p_ssms_env, 0, sizeof(struct ssm_env_tag));
     p_ssms_env->ssm_cb__ = NULL;
     p_ssms_env->number   = 0;
 }
 
 void ssm_init(ssm_action ssm_action_cb) {
-    ssm_mem_init(); // malloc all_key_data, p_ssms_env
-    ESP_LOGI(TAG, "[ssm_init][all_key_data:%d][ssms_env:%d]", sizeof(all_key_data), sizeof(p_ssms_env));
+    ssm_mem_init(); // malloc p_ssms_env
     p_ssms_env->ssm_cb__ = ssm_action_cb; // callback: ssm_action_handle
     for (int i = 0; i < SSM_MAX_NUM; ++i) {
-        memcpy(&p_ssms_env->ssm[i], all_key_data + SSM_KEY_LENGTH * i, SSM_KEY_LENGTH);
         p_ssms_env->ssm[i].ss5_device_status = SSM5_NOUSE;
         p_ssms_env->ssm[i].conn_id           = 0xFF; // 0xFF: not connected
     }

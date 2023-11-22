@@ -1,11 +1,11 @@
 #include "ssm5.h"
 #include "aes-cbc-cmac.h"
 #include "c_ccm.h"
+#include "esp_err.h"
 #include "esp_log.h"
 #include "esp_random.h"
 #include "uECC.h"
 #include <string.h>
-#include "esp_err.h"
 
 static const char * TAG = "ssm5.c";
 
@@ -81,10 +81,12 @@ static void ssm_initial_handle(sesame * ss5, uint8_t cmd_it_code) {
 
     uint8_t null_ssm_count = 0;
     for (uint8_t i = 0; i < SSM_MAX_NUM; i++) {
+        ESP_LOGW(TAG, "[ss5][ssm[%d].device_secret][%d]", i, p_ssms_env->ssm[i].device_secret[i]);
         if (p_ssms_env->ssm[i].device_secret[i] == 0) {
             null_ssm_count++;
         }
     }
+    ESP_LOGW(TAG, "[ss5][null_ssm_count: %d]", null_ssm_count);
     if (null_ssm_count == SSM_MAX_NUM) { // no device_secret
         ESP_LOGI(TAG, "[ss5][no device_secret]");
         register_sesame5(ss5);
