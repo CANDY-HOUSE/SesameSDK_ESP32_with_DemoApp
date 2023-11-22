@@ -16,9 +16,9 @@ struct ble_hs_cfg;
 union ble_store_value;
 union ble_store_key;
 
-static const ble_uuid_t * sesame5_svc_uuid = BLE_UUID16_DECLARE(BLECENT_SVC_ALERT_UUID);
-static const ble_uuid_t * sesame5_chr_uuid = BLE_UUID128_DECLARE(0x3e, 0x99, 0x76, 0xc6, 0xb4, 0xdb, 0xd3, 0xb6, 0x56, 0x98, 0xae, 0xa5, 0x02, 0x00, 0x86, 0x16);
-static const ble_uuid_t * sesame5_ntf_uuid = BLE_UUID128_DECLARE(0x3e, 0x99, 0x76, 0xc6, 0xb4, 0xdb, 0xd3, 0xb6, 0x56, 0x98, 0xae, 0xa5, 0x03, 0x00, 0x86, 0x16);
+static const ble_uuid_t * sesame_svc_uuid = BLE_UUID16_DECLARE(BLECENT_SVC_ALERT_UUID);
+static const ble_uuid_t * sesame_chr_uuid = BLE_UUID128_DECLARE(0x3e, 0x99, 0x76, 0xc6, 0xb4, 0xdb, 0xd3, 0xb6, 0x56, 0x98, 0xae, 0xa5, 0x02, 0x00, 0x86, 0x16);
+static const ble_uuid_t * sesame_ntf_uuid = BLE_UUID128_DECLARE(0x3e, 0x99, 0x76, 0xc6, 0xb4, 0xdb, 0xd3, 0xb6, 0x56, 0x98, 0xae, 0xa5, 0x03, 0x00, 0x86, 0x16);
 
 static const char * TAG = "blecent.c";
 
@@ -27,7 +27,7 @@ static int blecent_on_write(uint16_t conn_handle) {
     uint8_t value[2];
     const struct peer * peer = peer_find(conn_handle);
 
-    dsc = peer_dsc_find_uuid(peer, BLE_UUID16_DECLARE(BLECENT_SVC_ALERT_UUID), sesame5_ntf_uuid, BLE_UUID16_DECLARE(BLE_GATT_DSC_CLT_CFG_UUID16));
+    dsc = peer_dsc_find_uuid(peer, BLE_UUID16_DECLARE(BLECENT_SVC_ALERT_UUID), sesame_ntf_uuid, BLE_UUID16_DECLARE(BLE_GATT_DSC_CLT_CFG_UUID16));
     if (dsc == NULL) {
         ESP_LOGE(TAG,
                  "Error: Peer lacks a CCCD for the Unread Alert "
@@ -84,7 +84,7 @@ static int ble_gap_event_connect_handle(struct ble_gap_event * event, void * arg
         ESP_LOGE(TAG, "Failed to add peer; rc=%d\n", rc);
         return ESP_FAIL;
     }
-    ESP_LOGI(TAG, "ss5 conn_id: %d", event->connect.conn_handle);
+    ESP_LOGI(TAG, "ssm conn_id: %d", event->connect.conn_handle);
     for (uint8_t i = 0; i < SSM_MAX_NUM; i++) {
         ESP_LOGI(TAG, "ssm[%d].addr", i);
         ESP_LOG_BUFFER_HEX_LEVEL("[ssm.addr]", p_ssms_env->ssm[i].addr, 6, ESP_LOG_INFO);
@@ -130,7 +130,7 @@ static int ble_gap_connect_event(struct ble_gap_event * event, void * arg) {
         return ESP_OK;
 
     case BLE_GAP_EVENT_NOTIFY_RX:
-        ssm_say_handler(event->notify_rx.om->om_data, event->notify_rx.om->om_len, event->notify_rx.conn_handle); // talk to sesame5
+        ssm_say_handler(event->notify_rx.om->om_data, event->notify_rx.om->om_len, event->notify_rx.conn_handle); // talk to sesame
         return ESP_OK;
 
     case BLE_GAP_EVENT_MTU:
@@ -149,13 +149,13 @@ static int ble_gap_connect_event(struct ble_gap_event * event, void * arg) {
     }
 }
 
-static void blecent_connect_sesame5(const struct ble_hs_adv_fields * fields, void * disc) {
+static void blecent_connect_sesame(const struct ble_hs_adv_fields * fields, void * disc) {
     ble_addr_t * addr = &((struct ble_gap_disc_desc *) disc)->addr;
     int8_t rssi       = ((struct ble_gap_disc_desc *) disc)->rssi;
     if (rssi < -60) { // RSSI threshold
         return;
     }
-    if (fields->mfg_data[0] == 0x5A && fields->mfg_data[1] == 0x05) { // SSM
+    if (fields->mfg_data[0] == 0x5A && fields->mfg_data[1] == 0x05) { // is SSM
         if (fields->mfg_data[4] == 0x00) {                            // unregistered SSM
             ESP_LOGI(TAG, "find unregistered SSM[%d]", fields->mfg_data[2]);
             ESP_LOG_BUFFER_HEX_LEVEL("find SSM", addr->val, 6, ESP_LOG_INFO);
@@ -185,7 +185,7 @@ static int ble_gap_disc_event(struct ble_gap_event * event, void * arg) {
     if (rc != 0) {
         return ESP_FAIL;
     }
-    blecent_connect_sesame5(&fields, &event->disc);
+    blecent_connect_sesame(&fields, &event->disc);
     return ESP_OK;
 }
 
@@ -227,7 +227,7 @@ void esp_ble_gatt_write(sesame * ssm, uint8_t * value, uint16_t length) {
     const struct peer_chr * chr;
     const struct peer * peer;
     peer = peer_find(ssm->conn_id);
-    chr  = peer_chr_find_uuid(peer, sesame5_svc_uuid, sesame5_chr_uuid);
+    chr  = peer_chr_find_uuid(peer, sesame_svc_uuid, sesame_chr_uuid);
     if (chr == NULL) {
         ESP_LOGE(TAG, "Error: Peer doesn't have the subscribable characteristic\n");
         return;

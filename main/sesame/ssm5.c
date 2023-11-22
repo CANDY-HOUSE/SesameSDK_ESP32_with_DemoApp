@@ -164,7 +164,7 @@ void ss5_ble_receiver(sesame * ssm, const uint8_t * p_data, uint16_t len) {
     memcpy(ssm->b_buf, ssm->b_buf + 2, ssm->c_offset);
     // ESP_LOG_BUFFER_HEX("[ssm][say]", ssm->b_buf, ssm->c_offset);
     ESP_LOGI(TAG, "[ssm][op:%x][it:%x]", cmd_op_code, cmd_it_code);
-    if (cmd_op_code == SSM5_OP_CODE_PUBLISH) {
+    if (cmd_op_code == SSM_OP_CODE_PUBLISH) {
         ss5_parse_publish(ssm, cmd_it_code);
     }
     if (cmd_op_code == SSM_OP_CODE_RESPONSE) {

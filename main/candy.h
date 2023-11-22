@@ -46,8 +46,8 @@ typedef enum {
 
 typedef enum {
     SSM_OP_CODE_RESPONSE = 0x07,
-    SSM5_OP_CODE_PUBLISH = 0x08,
-} ssm5_op_code_e;
+    SSM_OP_CODE_PUBLISH  = 0x08,
+} ssm_op_code_e;
 
 typedef enum {
     SSM_ITEM_CODE_NONE                  = 0,
@@ -83,7 +83,7 @@ typedef enum {
     SSM_ITEM_CODE_TOGGLE = 88,
     SSM_ITEM_CODE_CLICK  = 89,
 
-} ssm5_item_code_e;
+} ssm_item_code_e;
 
 #ifdef __cplusplus
 }
