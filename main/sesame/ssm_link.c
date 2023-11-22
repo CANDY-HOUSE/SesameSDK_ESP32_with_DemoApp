@@ -1,3 +1,4 @@
+#include "ssm_link.h"
 #include "blecent.h"
 #include "c_ccm.h"
 #include "candy.h"
@@ -5,15 +6,13 @@
 #include "esp_heap_caps.h"
 #include "esp_log.h"
 #include "nimble/ble.h"
-#include "ssm5.h"
-#include "ssm_link.h"
+#include "ssm_cmd.h"
 #include "uECC.h"
 #include <aes-cbc-cmac.h>
 #include <stdbool.h>
 #include <string.h>
 
-
-static const char * TAG = "ssm.c";
+static const char * TAG = "ssm_link.c";
 
 static uint8_t additional_data[] = { 0x00 };
 

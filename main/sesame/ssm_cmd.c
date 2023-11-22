@@ -1,13 +1,14 @@
-#include "ssm5.h"
 #include "aes-cbc-cmac.h"
 #include "c_ccm.h"
 #include "esp_err.h"
 #include "esp_log.h"
 #include "esp_random.h"
+#include "ssm_cmd.h"
 #include "uECC.h"
 #include <string.h>
 
-static const char * TAG = "ssm5.c";
+
+static const char * TAG    = "ssm5.c";
 static uint8_t tag_esp32[] = { 'S', 'E', 'S', 'A', 'M', 'E', ' ', 'E', 'S', 'P', '3', '2' };
 
 uint8_t ecc_private_esp32[32];
