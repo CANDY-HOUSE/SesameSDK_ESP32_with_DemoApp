@@ -45,8 +45,8 @@ void talk_to_ssm(sesame * ssm, uint8_t parsing_type) {
     ESP_LOGI(TAG, "[%x][talk_to_ssm] => [ssm->c_offset: %d]", ssm->conn_id, ssm->c_offset);
     ESP_LOG_BUFFER_HEX_LEVEL("[esp32][say]", ssm->b_buf, ssm->c_offset, ESP_LOG_INFO);
     if (parsing_type == SSM_SEG_PARSING_TYPE_CIPHERTEXT) {
-        aes_ccm_encrypt_and_tag(ssm->cipher.ss5.ccm_key, (const unsigned char *) &ssm->cipher.ss5.encrypt, 13, additional_data, 1, ssm->b_buf, ssm->c_offset, ssm->b_buf, ssm->b_buf + ssm->c_offset, CCM_TAG_LENGTH);
-        ssm->cipher.ss5.encrypt.count++;
+        aes_ccm_encrypt_and_tag(ssm->cipher.ssm.ccm_key, (const unsigned char *) &ssm->cipher.ssm.encrypt, 13, additional_data, 1, ssm->b_buf, ssm->c_offset, ssm->b_buf, ssm->b_buf + ssm->c_offset, CCM_TAG_LENGTH);
+        ssm->cipher.ssm.encrypt.count++;
         ssm->c_offset = ssm->c_offset + CCM_TAG_LENGTH;
     }
 
@@ -83,12 +83,12 @@ void ssm_disconnect(sesame * ssm) {
 
 static void ssm_initial_handle(sesame * ssm, uint8_t cmd_it_code) {
     // reset cipher
-    ssm->cipher.ss5.encrypt.nouse = 0;
-    ssm->cipher.ss5.decrypt.nouse = 0;
-    memcpy(ssm->cipher.ss5.encrypt.tk_app_ssm, ssm->b_buf, 4);
-    memcpy(ssm->cipher.ss5.decrypt.tk_app_ssm, ssm->b_buf, 4);
-    ssm->cipher.ss5.encrypt.count = 0;
-    ssm->cipher.ss5.decrypt.count = 0;
+    ssm->cipher.ssm.encrypt.nouse = 0;
+    ssm->cipher.ssm.decrypt.nouse = 0;
+    memcpy(ssm->cipher.ssm.encrypt.tk_app_ssm, ssm->b_buf, 4);
+    memcpy(ssm->cipher.ssm.decrypt.tk_app_ssm, ssm->b_buf, 4);
+    ssm->cipher.ssm.encrypt.count = 0;
+    ssm->cipher.ssm.decrypt.count = 0;
 
     uint8_t null_ssm_count = 0;
     for (uint8_t i = 0; i < SSM_MAX_NUM; i++) {
@@ -96,9 +96,9 @@ static void ssm_initial_handle(sesame * ssm, uint8_t cmd_it_code) {
             null_ssm_count++;
         }
     }
-    ESP_LOGI(TAG, "[ss5][null_ssm_count: %d]", null_ssm_count);
+    ESP_LOGI(TAG, "[ssm][null_ssm_count: %d]", null_ssm_count);
     if (null_ssm_count == SSM_MAX_NUM) { // no device_secret
-        ESP_LOGI(TAG, "[ss5][no device_secret]");
+        ESP_LOGI(TAG, "[ssm][no device_secret]");
         register_sesame(ssm);
         return;
     }
@@ -157,8 +157,8 @@ static void ssm_ble_receiver(sesame * ssm, const uint8_t * p_data, uint16_t len)
     }
     if (p_data[0] >> 1u == SSM_SEG_PARSING_TYPE_CIPHERTEXT) {
         ssm->c_offset = ssm->c_offset - CCM_TAG_LENGTH;
-        aes_ccm_auth_decrypt(ssm->cipher.ss5.ccm_key, (const unsigned char *) &ssm->cipher.ss5.decrypt, 13, additional_data, 1, ssm->b_buf, ssm->c_offset, ssm->b_buf, ssm->b_buf + ssm->c_offset, CCM_TAG_LENGTH);
-        ssm->cipher.ss5.decrypt.count++;
+        aes_ccm_auth_decrypt(ssm->cipher.ssm.ccm_key, (const unsigned char *) &ssm->cipher.ssm.decrypt, 13, additional_data, 1, ssm->b_buf, ssm->c_offset, ssm->b_buf, ssm->b_buf + ssm->c_offset, CCM_TAG_LENGTH);
+        ssm->cipher.ssm.decrypt.count++;
     }
 
     uint8_t cmd_op_code = ssm->b_buf[0];

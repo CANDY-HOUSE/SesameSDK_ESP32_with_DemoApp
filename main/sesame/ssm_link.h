@@ -26,7 +26,7 @@ typedef struct {
 } SesameBleCipher;
 
 union ssm_cipher {
-    SesameBleCipher ss5;
+    SesameBleCipher ssm;
 };
 
 typedef struct {
