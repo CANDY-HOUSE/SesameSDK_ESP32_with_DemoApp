@@ -55,7 +55,7 @@ void ss5_unlock(sesame * ss5, uint8_t * tag, uint8_t tag_len) {
 }
 
 void ss5_toggle(sesame * ss5, uint8_t * tag, uint8_t tag_len) {
-    if (ss5->ss5_device_status == SSM5_LOCKED) {
+    if (ss5->device_status == SSM5_LOCKED) {
         ss5_unlock(ss5, tag, tag_len);
     } else {
         ss5_lock(ss5, tag, tag_len);
@@ -101,13 +101,13 @@ void ss5_parse_publish(sesame * ss5, uint8_t cmd_it_code) {
     }
     if (cmd_it_code == SSM5_ITEM_CODE_MECH_STATUS) {
         // ESP_LOG_BUFFER_HEX_LEVEL("MECH_STATUS", ss5->b_buf, 32, ESP_LOG_INFO);
-        bool isInLockRange           = (ss5->b_buf[6] & 2u) > 0u;
-        bool isInUnlockRange         = (ss5->b_buf[6] & 4u) > 0u;
-        ss5_device_status lockStatus = isInLockRange ? SSM5_LOCKED : isInUnlockRange ? SSM5_UNLOCKED : SSM5_MOVED;
-        // ESP_LOGI("[ss5][mech_status]", "[%d][ss5][current lockStatus: %d][ss5->ss5_device_status: %d]", ss5->conn_id, lockStatus, ss5->ss5_device_status);
+        bool isInLockRange       = (ss5->b_buf[6] & 2u) > 0u;
+        bool isInUnlockRange     = (ss5->b_buf[6] & 4u) > 0u;
+        device_status lockStatus = isInLockRange ? SSM5_LOCKED : isInUnlockRange ? SSM5_UNLOCKED : SSM5_MOVED;
+        // ESP_LOGI("[ss5][mech_status]", "[%d][ss5][current lockStatus: %d][ss5->device_status: %d]", ss5->conn_id, lockStatus, ss5->device_status);
         memcpy(ss5->mechStatus, ss5->b_buf, 7);
-        if (ss5->ss5_device_status != lockStatus) {
-            ss5->ss5_device_status = lockStatus;
+        if (ss5->device_status != lockStatus) {
+            ss5->device_status = lockStatus;
             p_ssms_env->ssm_cb__(ss5); // callback: ssm_action_handle
         }
     }
@@ -119,7 +119,7 @@ void ss5_parse_response(sesame * ss5, uint8_t cmd_it_code) {
 
     if (cmd_it_code == SSM5_ITEM_CODE_LOGIN) {
         ESP_LOGI(TAG, "[%d][ss5][login][ok]", ss5->conn_id);
-        ss5->ss5_device_status = SSM5_LOGGIN;
+        ss5->device_status = SSM5_LOGGIN;
         p_ssms_env->ssm_cb__(ss5); // callback: ssm_action_handle
     }
     if (cmd_it_code == SSM5_ITEM_CODE_HISTORY) {
@@ -131,14 +131,14 @@ void ss5_parse_response(sesame * ss5, uint8_t cmd_it_code) {
     }
     if (cmd_it_code == SSM5_ITEM_CODE_REGISTRATION) {
         ESP_LOGI(TAG, "[%d][ss5][registration][ok]", ss5->conn_id);
-        memcpy(ss5->ss5_pub_key, &ss5->b_buf[13], 64);
-        // ESP_LOG_BUFFER_HEX("ss5_pub_key", ss5->ss5_pub_key, 64);
+        memcpy(ss5->public_key, &ss5->b_buf[13], 64);
+        // ESP_LOG_BUFFER_HEX("public_key", ss5->public_key, 64);
         uint8_t ecdh_secret_ss5[32];
-        uECC_shared_secret_lit(ss5->ss5_pub_key, ecc_private_esp32, ecdh_secret_ss5, uECC_secp256r1());
+        uECC_shared_secret_lit(ss5->public_key, ecc_private_esp32, ecdh_secret_ss5, uECC_secp256r1());
         memcpy(ss5->device_secret, ecdh_secret_ss5, 16); // ss5 device_secret
         ESP_LOG_BUFFER_HEX("deviceSecret", ss5->device_secret, 16);
         AES_CMAC(ss5->device_secret, (const unsigned char *) ss5->cipher.ss5.decrypt.tk_app_ssm, 4, ss5->cipher.ss5.ccm_key);
-        ss5->ss5_device_status = SSM5_LOGGIN;
+        ss5->device_status = SSM5_LOGGIN;
         p_ssms_env->ssm_cb__(ss5);
     }
 }

@@ -22,7 +22,7 @@ static const ble_uuid_t * sesame5_ntf_uuid = BLE_UUID128_DECLARE(0x3e, 0x99, 0x7
 
 static const char * TAG = "blecent.c";
 
-static int blecent_on_write(uint16_t conn_handle, const struct ble_gatt_error * error, struct ble_gatt_attr * attr, void * arg) {
+static int blecent_on_write(uint16_t conn_handle) {
     const struct peer_dsc * dsc;
     uint8_t value[2];
     const struct peer * peer = peer_find(conn_handle);
@@ -64,7 +64,7 @@ static void blecent_on_service_disc_complete(const struct peer * peer, int statu
              "Service discovery complete; status=%d "
              "conn_handle=%d\n",
              status, peer->conn_handle);
-    blecent_on_write(peer->conn_handle, NULL, NULL, NULL);
+    blecent_on_write(peer->conn_handle);
 }
 
 static int ble_gap_event_connect_handle(struct ble_gap_event * event, void * arg, struct ble_gap_conn_desc * desc) {
@@ -78,7 +78,7 @@ static int ble_gap_event_connect_handle(struct ble_gap_event * event, void * arg
     int rc = ble_gap_conn_find(event->connect.conn_handle, desc);
     assert(rc == 0);
     print_conn_desc(desc);
-    ESP_LOGI(TAG, "\n");
+    ESP_LOGI(TAG, "get peer info success");
     rc = peer_add(event->connect.conn_handle);
     if (rc != 0) {
         ESP_LOGE(TAG, "Failed to add peer; rc=%d\n", rc);
@@ -90,8 +90,8 @@ static int ble_gap_event_connect_handle(struct ble_gap_event * event, void * arg
         ESP_LOG_BUFFER_HEX_LEVEL("[ssm.addr]", p_ssms_env->ssm[i].addr, 6, ESP_LOG_INFO);
         if (memcmp(p_ssms_env->ssm[i].addr, (*desc).peer_id_addr.val, 6) == 0) {
             ESP_LOGI(TAG, "ssm[%d] connected", i);
-            p_ssms_env->ssm[i].ss5_device_status = SSM5_CONNECTED;             // set the device status
-            p_ssms_env->ssm[i].conn_id           = event->connect.conn_handle; // save the connection handle
+            p_ssms_env->ssm[i].device_status = SSM5_CONNECTED;             // set the device status
+            p_ssms_env->ssm[i].conn_id       = event->connect.conn_handle; // save the connection handle
             break;
         }
     }
@@ -118,7 +118,7 @@ static int ble_gap_connect_event(struct ble_gap_event * event, void * arg) {
         print_conn_desc(&event->disconnect.conn);
         peer_delete(event->disconnect.conn.conn_handle);
         return ESP_OK;
-    
+
     case BLE_GAP_EVENT_CONN_UPDATE_REQ:
         printf("connection update request event; "
                "conn_handle=%d itvl_min=%d itvl_max=%d "
@@ -143,7 +143,7 @@ static int ble_gap_connect_event(struct ble_gap_event * event, void * arg) {
         assert(rc == 0);
         ble_store_util_delete_peer(&desc.peer_id_addr);
         return BLE_GAP_REPEAT_PAIRING_RETRY;
-    
+
     default:
         return ESP_OK;
     }
@@ -199,7 +199,7 @@ static void blecent_scan(void) {
     disc_params.window            = 0;
     disc_params.filter_policy     = 0;
     disc_params.limited           = 0;
-    int rc = ble_gap_disc(BLE_OWN_ADDR_PUBLIC, BLE_HS_FOREVER, &disc_params, ble_gap_disc_event, NULL);
+    int rc                        = ble_gap_disc(BLE_OWN_ADDR_PUBLIC, BLE_HS_FOREVER, &disc_params, ble_gap_disc_event, NULL);
     if (rc != 0) {
         ESP_LOGE(TAG, "Error initiating GAP discovery procedure; rc=0x%x\n", rc);
     }
@@ -217,8 +217,8 @@ void esp_ble_init(void) {
         ESP_LOGE(TAG, "Failed to init nimble %d ", ret);
         return;
     }
-    ble_hs_cfg.sync_cb  = blecent_scan;
-    int rc = peer_init(SSM_MAX_NUM, 64, 64, 64);
+    ble_hs_cfg.sync_cb = blecent_scan;
+    int rc             = peer_init(SSM_MAX_NUM, 64, 64, 64);
     assert(rc == 0);
     nimble_port_freertos_init(blecent_host_task);
 }

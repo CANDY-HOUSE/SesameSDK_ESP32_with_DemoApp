@@ -34,10 +34,10 @@ union ssm_cipher {
 
 typedef struct {
     uint8_t device_uuid[16];
-    uint8_t ss5_pub_key[64];
+    uint8_t public_key[64];
     uint8_t device_secret[16];
     uint8_t addr[6];
-    uint8_t ss5_device_status;
+    uint8_t device_status;
     union ssm_cipher cipher;
     uint8_t mechStatus[7];
     uint16_t c_offset;
@@ -56,7 +56,6 @@ struct ssm_env_tag {
 #pragma pack()
 
 extern struct ssm_env_tag * p_ssms_env;
-
 
 void ssm_init(ssm_action ssm_action_cb);
 

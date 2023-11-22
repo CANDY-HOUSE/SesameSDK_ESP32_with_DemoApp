@@ -31,11 +31,11 @@ static void ssm_mem_init(void) {
 }
 
 void ssm_init(ssm_action ssm_action_cb) {
-    ssm_mem_init(); // malloc p_ssms_env
+    ssm_mem_init();                       // malloc p_ssms_env
     p_ssms_env->ssm_cb__ = ssm_action_cb; // callback: ssm_action_handle
     for (int i = 0; i < SSM_MAX_NUM; ++i) {
-        p_ssms_env->ssm[i].ss5_device_status = SSM5_NOUSE;
-        p_ssms_env->ssm[i].conn_id           = 0xFF; // 0xFF: not connected
+        p_ssms_env->ssm[i].device_status = SSM5_NOUSE;
+        p_ssms_env->ssm[i].conn_id       = 0xFF; // 0xFF: not connected
     }
 }
 
@@ -74,8 +74,8 @@ void talk_to_ssm(sesame * ssm, uint8_t parsing_type) {
 }
 
 void ssm_disconnect(sesame * ssm) {
-    ESP_LOGW(TAG, "[ss2][disconnect]");
-    if (ssm->ss5_device_status >= SSM5_CONNECTED) {
+    ESP_LOGW(TAG, "[ssm][disconnect]");
+    if (ssm->device_status >= SSM5_CONNECTED) {
         ble_gap_terminate(ssm->conn_id, BLE_ERR_REM_USER_CONN_TERM); // disconnect
     }
 }
@@ -106,9 +106,9 @@ void ssm_lock_all(uint8_t * tag, uint8_t tag_length) {
 void ssm_toggle_all(uint8_t * tag, uint8_t tag_length) {
     ESP_LOGI(TAG, "[ssm][ssm_toggle_all]");
     for (int i = 0; i < SSM_MAX_NUM; ++i) {
-        if (p_ssms_env->ssm[i].ss5_device_status == SSM5_LOCKED) {
+        if (p_ssms_env->ssm[i].device_status == SSM5_LOCKED) {
             ssm_unlock_all(tag, tag_length);
-        } else if (p_ssms_env->ssm[i].ss5_device_status == SSM5_UNLOCKED) {
+        } else if (p_ssms_env->ssm[i].device_status == SSM5_UNLOCKED) {
             ssm_lock_all(tag, tag_length);
         }
     }
@@ -117,8 +117,8 @@ void ssm_toggle_all(uint8_t * tag, uint8_t tag_length) {
 uint8_t tag_esp32[] = { 'S', 'E', 'S', 'A', 'M', 'E', ' ', 'E', 'S', 'P', '3', '2' };
 
 void ssm_lock(sesame * ssm, uint8_t * tag, uint8_t tag_length) {
-    ESP_LOGI(TAG, "[ssm][lock][ssm->ss5_device_status: %d]", ssm->ss5_device_status);
-    if (ssm->ss5_device_status >= SSM5_LOGGIN) {
+    ESP_LOGI(TAG, "[ssm][lock][ssm->device_status: %d]", ssm->device_status);
+    if (ssm->device_status >= SSM5_LOGGIN) {
         if (tag_length == 0) {
             ss5_lock(ssm, tag_esp32, sizeof(tag_esp32));
         } else {
@@ -128,8 +128,8 @@ void ssm_lock(sesame * ssm, uint8_t * tag, uint8_t tag_length) {
 }
 
 void ssm_unlock(sesame * ssm, uint8_t * tag, uint8_t tag_length) {
-    ESP_LOGI(TAG, "[ssm][unlock][ssm->ss5_device_status: %d]", ssm->ss5_device_status);
-    if (ssm->ss5_device_status >= SSM5_LOGGIN) {
+    ESP_LOGI(TAG, "[ssm][unlock][ssm->device_status: %d]", ssm->device_status);
+    if (ssm->device_status >= SSM5_LOGGIN) {
         if (tag_length == 0) {
             ss5_unlock(ssm, tag_esp32, sizeof(tag_esp32));
         } else {
@@ -140,10 +140,10 @@ void ssm_unlock(sesame * ssm, uint8_t * tag, uint8_t tag_length) {
 
 void add_ssm(uint8_t * addr) {
     for (int i = 0; i < SSM_MAX_NUM; ++i) {
-        if (p_ssms_env->ssm[i].ss5_device_status == SSM5_NOUSE) {
+        if (p_ssms_env->ssm[i].device_status == SSM5_NOUSE) {
             memcpy(p_ssms_env->ssm[i].addr, addr, 6);
-            p_ssms_env->ssm[i].ss5_device_status = SSM5_DISCONNECTED;
-            p_ssms_env->ssm[i].conn_id           = 0xFF;
+            p_ssms_env->ssm[i].device_status = SSM5_DISCONNECTED;
+            p_ssms_env->ssm[i].conn_id       = 0xFF;
         }
     }
 }

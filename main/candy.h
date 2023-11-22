@@ -30,7 +30,7 @@ typedef enum {
     SSM5_LOCKED       = 6,
     SSM5_UNLOCKED     = 7,
     SSM5_MOVED        = 8,
-} ss5_device_status;
+} device_status;
 
 #define SSM_STATUS_STR(status)                                                                                                                                                                                                                                \
     ((status) == SSM5_NOUSE              ? "NOUSE"                                                                                                                                                                                                            \
