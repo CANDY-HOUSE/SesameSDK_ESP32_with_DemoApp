@@ -1,7 +1,7 @@
-#ifndef _CANDY_H_
-#define _CANDY_H_
+#ifndef __CANDY_H__
+#define __CANDY_H__
 
-#include <stdint.h> // for uint8_t
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -71,4 +71,4 @@ typedef enum {
 }
 #endif
 
-#endif /* _CANDY_H_ */
+#endif /* __CANDY_H__ */
