@@ -7,13 +7,15 @@
 extern "C" {
 #endif
 
-void ss5_lock(sesame * ssm, uint8_t * tag, uint8_t tag_len);
-
-void ss5_unlock(sesame * ssm, uint8_t * tag, uint8_t tag_len);
-
 void ssm_ble_receiver(sesame * ssm, const uint8_t * p_data, uint16_t len);
 
 void ss5_readHistoryCommand(sesame * ssm);
+
+void ssm_unlock_all(uint8_t * tag, uint8_t tag_length);
+
+void ssm_lock_all(uint8_t * tag, uint8_t tag_length);
+
+void ssm_toggle_all(uint8_t * tag, uint8_t tag_length);
 
 #ifdef __cplusplus
 }
