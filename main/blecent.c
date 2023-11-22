@@ -165,7 +165,7 @@ static void blecent_connect_sesame5(const struct ble_hs_adv_fields * fields, voi
             return;
         }
     } else { // not SSM
-        ESP_LOGW(TAG, "not SSM !! ");
+        // ESP_LOGW(TAG, "not SSM !! ");
         return;
     }
     ble_gap_disc_cancel(); /* Scanning must be stopped before a connection can be nitiated. */
