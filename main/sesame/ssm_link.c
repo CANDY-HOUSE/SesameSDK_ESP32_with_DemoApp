@@ -1,4 +1,3 @@
-#include "ssm.h"
 #include "blecent.h"
 #include "c_ccm.h"
 #include "candy.h"
@@ -7,10 +6,12 @@
 #include "esp_log.h"
 #include "nimble/ble.h"
 #include "ssm5.h"
+#include "ssm_link.h"
 #include "uECC.h"
 #include <aes-cbc-cmac.h>
 #include <stdbool.h>
 #include <string.h>
+
 
 static const char * TAG = "ssm.c";
 
@@ -107,7 +108,7 @@ static void ssm_initial_handle(sesame * ssm, uint8_t cmd_it_code) {
 
 static void ssm_parse_publish(sesame * ssm, uint8_t cmd_it_code) {
     ESP_LOGI(TAG, "[ssm_parse_publish][%d]", cmd_it_code);
-    if (cmd_it_code == SSM_ITEM_CODE_INITIAL) { //get 4 bytes random_code
+    if (cmd_it_code == SSM_ITEM_CODE_INITIAL) { // get 4 bytes random_code
         ssm_initial_handle(ssm, cmd_it_code);
     }
     if (cmd_it_code == SSM_ITEM_CODE_MECH_STATUS) {

@@ -1,7 +1,7 @@
 #ifndef __SESAME_V5_H__
 #define __SESAME_V5_H__
 
-#include "ssm.h"
+#include "ssm_link.h"
 
 #ifdef __cplusplus
 extern "C" {

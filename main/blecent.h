@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-#include "ssm.h"
+#include "ssm_link.h"
 
 void esp_ble_init(void);
 
