@@ -7,7 +7,7 @@
 
 static const char * TAG = "ssm_cmd.c";
 
-static const uint8_t tag_esp32[] = { 'S', 'E', 'S', 'A', 'M', 'E', ' ', 'E', 'S', 'P', '3', '2' };
+static uint8_t tag_esp32[] = { 'S', 'E', 'S', 'A', 'M', 'E', ' ', 'E', 'S', 'P', '3', '2' };
 
 static uint8_t ecc_private_esp32[32];
 
@@ -35,7 +35,7 @@ void handle_reg_data_from_ssm(sesame * ssm) {
     uECC_shared_secret_lit(ssm->public_key, ecc_private_esp32, ecdh_secret_ssm, uECC_secp256r1());
     memcpy(ssm->device_secret, ecdh_secret_ssm, 16); // ssm device_secret
     ESP_LOG_BUFFER_HEX("deviceSecret", ssm->device_secret, 16);
-    AES_CMAC(ssm->device_secret, (const unsigned char *) ssm->cipher.ssm.decrypt.tk_app_ssm, 4, ssm->cipher.ssm.ccm_key);
+    AES_CMAC(ssm->device_secret, (const unsigned char *) ssm->cipher.ssm.decrypt.random_code, 4, ssm->cipher.ssm.ccm_key);
     ssm->device_status = SSM_LOGGIN;
     p_ssms_env->ssm_cb__(ssm);
 }
@@ -43,7 +43,7 @@ void handle_reg_data_from_ssm(sesame * ssm) {
 void send_login_cmd_to_ssm(sesame * ssm) {
     ESP_LOGI(TAG, "[ssm][login][->]");
     ssm->b_buf[0] = SSM_ITEM_CODE_LOGIN;
-    AES_CMAC(ssm->device_secret, (const unsigned char *) ssm->cipher.ssm.decrypt.tk_app_ssm, 4, ssm->cipher.ssm.ccm_key);
+    AES_CMAC(ssm->device_secret, (const unsigned char *) ssm->cipher.ssm.decrypt.random_code, 4, ssm->cipher.ssm.ccm_key);
     memcpy(&ssm->b_buf[1], ssm->cipher.ssm.ccm_key, 4);
     ssm->c_offset = 5;
     talk_to_ssm(ssm, SSM_SEG_PARSING_TYPE_PLAINTEXT);

@@ -21,8 +21,8 @@ void ssm_init(ssm_action ssm_action_cb) {
     memset(p_ssms_env, 0, sizeof(struct ssm_env_tag));
     p_ssms_env->number            = 0;
     p_ssms_env->ssm_cb__          = ssm_action_cb; // callback: ssm_action_handle
+    p_ssms_env->ssm.conn_id       = 0xFF;          // 0xFF: not connected
     p_ssms_env->ssm.device_status = SSM_NOUSE;
-    p_ssms_env->ssm.conn_id       = 0xFF; // 0xFF: not connected
 }
 
 void talk_to_ssm(sesame * ssm, uint8_t parsing_type) {
@@ -69,8 +69,8 @@ static void ssm_initial_handle(sesame * ssm, uint8_t cmd_it_code) {
     // reset cipher
     ssm->cipher.ssm.encrypt.nouse = 0;
     ssm->cipher.ssm.decrypt.nouse = 0;
-    memcpy(ssm->cipher.ssm.encrypt.tk_app_ssm, ssm->b_buf, 4);
-    memcpy(ssm->cipher.ssm.decrypt.tk_app_ssm, ssm->b_buf, 4);
+    memcpy(ssm->cipher.ssm.encrypt.random_code, ssm->b_buf, 4);
+    memcpy(ssm->cipher.ssm.decrypt.random_code, ssm->b_buf, 4);
     ssm->cipher.ssm.encrypt.count = 0;
     ssm->cipher.ssm.decrypt.count = 0;
 

@@ -16,7 +16,7 @@ extern "C" {
 typedef struct {
     int64_t count;
     uint8_t nouse;
-    uint8_t tk_app_ssm[4];
+    uint8_t random_code[4];
 } SSM_CCM_NONCE;
 
 typedef struct {
