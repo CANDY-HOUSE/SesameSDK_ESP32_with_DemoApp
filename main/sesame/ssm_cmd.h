@@ -1,7 +1,7 @@
 #ifndef __SSM_CMD_H__
 #define __SSM_CMD_H__
 
-#include "ssm_link.h"
+#include "ssm.h"
 
 #ifdef __cplusplus
 extern "C" {

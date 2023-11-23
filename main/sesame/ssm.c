@@ -1,7 +1,8 @@
-#include "ssm_link.h"
 #include "blecent.h"
 #include "c_ccm.h"
+#include "ssm.h"
 #include "ssm_cmd.h"
+
 
 static const char * TAG = "ssm_link.c";
 
