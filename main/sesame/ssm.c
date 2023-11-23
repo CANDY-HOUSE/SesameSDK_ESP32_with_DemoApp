@@ -1,8 +1,7 @@
+#include "ssm.h"
 #include "blecent.h"
 #include "c_ccm.h"
-#include "ssm.h"
 #include "ssm_cmd.h"
-
 
 static const char * TAG = "ssm_link.c";
 
@@ -14,18 +13,13 @@ void ssm_mem_deinit(void) {
     free(p_ssms_env);
 }
 
-static void ssm_mem_init(void) {
+void ssm_init(ssm_action ssm_action_cb) {
     p_ssms_env = (struct ssm_env_tag *) malloc(sizeof(struct ssm_env_tag));
     if (p_ssms_env == NULL) {
         ESP_LOGE(TAG, "[p_ssms_env][FAIL]");
     }
     memset(p_ssms_env, 0, sizeof(struct ssm_env_tag));
-    p_ssms_env->ssm_cb__ = NULL;
-    p_ssms_env->number   = 0;
-}
-
-void ssm_init(ssm_action ssm_action_cb) {
-    ssm_mem_init();                                // malloc p_ssms_env
+    p_ssms_env->number            = 0;
     p_ssms_env->ssm_cb__          = ssm_action_cb; // callback: ssm_action_handle
     p_ssms_env->ssm.device_status = SSM_NOUSE;
     p_ssms_env->ssm.conn_id       = 0xFF; // 0xFF: not connected
