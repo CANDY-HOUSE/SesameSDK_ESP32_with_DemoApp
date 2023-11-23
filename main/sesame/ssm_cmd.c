@@ -57,33 +57,21 @@ void send_read_history_cmd_to_ssm(sesame * ssm) {
     talk_to_ssm(ssm, SSM_SEG_PARSING_TYPE_CIPHERTEXT);
 }
 
-void ssm_lock(uint8_t * tag, uint8_t tag_length) {
-    sesame * ssm = &p_ssms_env->ssm;
-    ESP_LOGI(TAG, "[ssm][lock][ssm->device_status: %d]", ssm->device_status);
-    if (ssm->device_status >= SSM_LOGGIN) {
-        if (tag_length == 0) {
-            tag        = tag_esp32;
-            tag_length = sizeof(tag_esp32);
-        }
-        ssm->c_offset = tag_length + 2;
-        ssm->b_buf[0] = SSM_ITEM_CODE_LOCK;
-        ssm->b_buf[1] = tag_length;
-        memcpy(ssm->b_buf + 2, tag, tag_length);
-        talk_to_ssm(ssm, SSM_SEG_PARSING_TYPE_CIPHERTEXT);
-    }
-}
-
-void ssm_unlock(uint8_t * tag, uint8_t tag_length) {
+void ssm_lock_unlock(uint8_t cmd, uint8_t * tag, uint8_t tag_length) {
     sesame * ssm = &p_ssms_env->ssm;
     ESP_LOGI(TAG, "[ssm][unlock][ssm->device_status: %d]", ssm->device_status);
     if (ssm->device_status >= SSM_LOGGIN) {
+        if (cmd == SSM_ITEM_CODE_LOCK) {
+            ssm->b_buf[0] = cmd;
+        } else if (cmd == SSM_ITEM_CODE_UNLOCK) {
+            ssm->b_buf[0] = cmd;
+        }
         if (tag_length == 0) {
             tag        = tag_esp32;
             tag_length = sizeof(tag_esp32);
         }
-        ssm->c_offset = tag_length + 2;
-        ssm->b_buf[0] = SSM_ITEM_CODE_UNLOCK;
         ssm->b_buf[1] = tag_length;
+        ssm->c_offset = tag_length + 2;
         memcpy(ssm->b_buf + 2, tag, tag_length);
         talk_to_ssm(ssm, SSM_SEG_PARSING_TYPE_CIPHERTEXT);
     }
@@ -92,8 +80,8 @@ void ssm_unlock(uint8_t * tag, uint8_t tag_length) {
 void ssm_toggle(uint8_t * tag, uint8_t tag_length) {
     ESP_LOGI(TAG, "[ssm][ssm_toggle]");
     if (p_ssms_env->ssm.device_status == SSM_LOCKED) {
-        ssm_unlock(tag, tag_length);
+        ssm_lock_unlock(SSM_ITEM_CODE_UNLOCK, tag, tag_length);
     } else if (p_ssms_env->ssm.device_status == SSM_UNLOCKED) {
-        ssm_lock(tag, tag_length);
+        ssm_lock_unlock(SSM_ITEM_CODE_LOCK, tag, tag_length);
     }
 }
