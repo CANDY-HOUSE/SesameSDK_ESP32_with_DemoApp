@@ -1,18 +1,48 @@
-#ifndef _CANDY_H_
-#define _CANDY_H_
+#ifndef __CANDY_H__
+#define __CANDY_H__
 
-#include <stdint.h> // for uint8_t
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#define SSM_OP_CODE_STR(op_code) ((op_code) == 7 ? "response" : (op_code) == 8 ? "publish" : "unknown")
+#define SSM_ITEM_CODE_STR(code)                                                                                                                                                                                                                               \
+    ((code) == SSM_ITEM_CODE_NONE                        ? "SSM_ITEM_CODE_NONE"                                                                                                                                                                               \
+         : (code) == SSM_ITEM_CODE_REGISTRATION          ? "SSM_ITEM_CODE_REGISTRATION"                                                                                                                                                                       \
+         : (code) == SSM_ITEM_CODE_LOGIN                 ? "SSM_ITEM_CODE_LOGIN"                                                                                                                                                                              \
+         : (code) == SSM_ITEM_CODE_USER                  ? "SSM_ITEM_CODE_USER"                                                                                                                                                                               \
+         : (code) == SSM_ITEM_CODE_HISTORY               ? "SSM_ITEM_CODE_HISTORY"                                                                                                                                                                            \
+         : (code) == SSM_ITEM_CODE_VERSION_DETAIL        ? "SSM_ITEM_CODE_VERSION_DETAIL"                                                                                                                                                                     \
+         : (code) == SSM_ITEM_CODE_DISCONNECT_REBOOT_NOW ? "SSM_ITEM_CODE_DISCONNECT_REBOOT_NOW"                                                                                                                                                              \
+         : (code) == SSM_ITEM_CODE_ENABLE_DFU            ? "SSM_ITEM_CODE_ENABLE_DFU"                                                                                                                                                                         \
+         : (code) == SSM_ITEM_CODE_TIME                  ? "SSM_ITEM_CODE_TIME"                                                                                                                                                                               \
+         : (code) == SSM_ITEM_CODE_INITIAL               ? "SSM_ITEM_CODE_INITIAL"                                                                                                                                                                            \
+         : (code) == SSM_ITEM_CODE_MAGNET                ? "SSM_ITEM_CODE_MAGNET"                                                                                                                                                                             \
+         : (code) == SSM_ITEM_CODE_MECH_SETTING          ? "SSM_ITEM_CODE_MECH_SETTING"                                                                                                                                                                       \
+         : (code) == SSM_ITEM_CODE_MECH_STATUS           ? "SSM_ITEM_CODE_MECH_STATUS"                                                                                                                                                                        \
+         : (code) == SSM_ITEM_CODE_LOCK                  ? "SSM_ITEM_CODE_LOCK"                                                                                                                                                                               \
+         : (code) == SSM_ITEM_CODE_UNLOCK                ? "SSM_ITEM_CODE_UNLOCK"                                                                                                                                                                             \
+                                                         : "UNKNOWN_ITEM_CODE")
+#define SSM_STATUS_STR(status)                                                                                                                                                                                                                                \
+    ((status) == SSM_NOUSE              ? "NOUSE"                                                                                                                                                                                                             \
+         : (status) == SSM_DISCONNECTED ? "DISCONNECTED"                                                                                                                                                                                                      \
+         : (status) == SSM_SCANNING     ? "SCANNING"                                                                                                                                                                                                          \
+         : (status) == SSM_CONNECTING   ? "CONNECTING"                                                                                                                                                                                                        \
+         : (status) == SSM_CONNECTED    ? "CONNECTED"                                                                                                                                                                                                         \
+         : (status) == SSM_LOGGIN       ? "LOGGIN"                                                                                                                                                                                                            \
+         : (status) == SSM_LOCKED       ? "LOCKED"                                                                                                                                                                                                            \
+         : (status) == SSM_UNLOCKED     ? "UNLOCKED"                                                                                                                                                                                                          \
+         : (status) == SSM_MOVED        ? "MOVED"                                                                                                                                                                                                             \
+                                        : "status_error")
+
 #define SSM_MAX_CHAC_LEN (BLE_MAX_OCTETS - 4 - 3)
 #define CCM_TAG_LENGTH (4)
 
-#define SSM5_SEG_PARSING_TYPE_APPEND_ONLY (0)
-#define SSM5_SEG_PARSING_TYPE_PLAINTEXT (1)
-#define SSM5_SEG_PARSING_TYPE_CIPHERTEXT (2)
+#define SSM_SEG_PARSING_TYPE_APPEND_ONLY (0)
+#define SSM_SEG_PARSING_TYPE_PLAINTEXT (1)
+#define SSM_SEG_PARSING_TYPE_CIPHERTEXT (2)
 
 typedef enum {
     SESAME_5      = 5,
@@ -21,72 +51,42 @@ typedef enum {
 } candy_product_type;
 
 typedef enum {
-    SSM5_NOUSE        = 0,
-    SSM5_DISCONNECTED = 1,
-    SSM5_SCANNING     = 2,
-    SSM5_CONNECTING   = 3,
-    SSM5_CONNECTED    = 4,
-    SSM5_LOGGIN       = 5,
-    SSM5_LOCKED       = 6,
-    SSM5_UNLOCKED     = 7,
-    SSM5_MOVED        = 8,
-} ss5_device_status;
-
-#define SSM_STATUS_STR(status)                                                                                                                                                                                                                                \
-    ((status) == SSM5_NOUSE              ? "NOUSE"                                                                                                                                                                                                            \
-         : (status) == SSM5_DISCONNECTED ? "DISCONNECTED"                                                                                                                                                                                                     \
-         : (status) == SSM5_SCANNING     ? "SCANNING"                                                                                                                                                                                                         \
-         : (status) == SSM5_CONNECTING   ? "CONNECTING"                                                                                                                                                                                                       \
-         : (status) == SSM5_CONNECTED    ? "CONNECTED"                                                                                                                                                                                                        \
-         : (status) == SSM5_LOGGIN       ? "LOGGIN"                                                                                                                                                                                                           \
-         : (status) == SSM5_LOCKED       ? "LOCKED"                                                                                                                                                                                                           \
-         : (status) == SSM5_UNLOCKED     ? "UNLOCKED"                                                                                                                                                                                                         \
-         : (status) == SSM5_MOVED        ? "MOVED"                                                                                                                                                                                                            \
-                                         : "status_error")
+    SSM_NOUSE        = 0,
+    SSM_DISCONNECTED = 1,
+    SSM_SCANNING     = 2,
+    SSM_CONNECTING   = 3,
+    SSM_CONNECTED    = 4,
+    SSM_LOGGIN       = 5,
+    SSM_LOCKED       = 6,
+    SSM_UNLOCKED     = 7,
+    SSM_MOVED        = 8,
+} device_status_t;
 
 typedef enum {
-    SSM5_OP_CODE_RESPONSE = 0x07,
-    SSM5_OP_CODE_PUBLISH  = 0x08,
-} ssm5_op_code_e;
+    SSM_OP_CODE_RESPONSE = 0x07,
+    SSM_OP_CODE_PUBLISH  = 0x08,
+} ssm_op_code_e;
 
 typedef enum {
-    SSM5_ITEM_CODE_NONE                  = 0,
-    SSM5_ITEM_CODE_REGISTRATION          = 1,
-    SSM5_ITEM_CODE_LOGIN                 = 2,
-    SSM5_ITEM_CODE_USER                  = 3,
-    SSM5_ITEM_CODE_HISTORY               = 4,
-    SSM5_ITEM_CODE_VERSION_DETAIL        = 5,
-    SSM5_ITEM_CODE_DISCONNECT_REBOOT_NOW = 6,
-    SSM5_ITEM_CODE_ENABLE_DFU            = 7,
-    SSM5_ITEM_CODE_TIME                  = 8,
-    SSM5_ITEM_CODE_BLE_CONNECTION_PARAM  = 9,
-    SSM5_ITEM_CODE_BLE_ADV_PARAM         = 10,
-    SSM5_ITEM_CODE_AUTOLOCK              = 11,
-    SSM5_ITEM_CODE_SERVER_ADV_KICK       = 12,
-    SSM5_ITEM_CODE_SESAME_TOKEN          = 13,
-    SSM5_ITEM_CODE_INITIAL               = 14,
-    SSM5_ITEM_CODE_IRER                  = 15,
-    SSM5_ITEM_CODE_TIMEPHONE             = 16,
-    SSM5_ITEM_CODE_MAGNET                = 17,
-    SSM5_ITEM_CODE_BLE_ADV_PARAM_GET     = 18, /// nouse
-    SSM5_ITEM_CODE_SENSOR_INVERVAL       = 19, /// nouse
-    SSM5_ITEM_CODE_SENSOR_INVERVAL_GET   = 20, /// nouse
-
-    SSM5_ITEM_CODE_MECH_SETTING = 80,
-    SSM5_ITEM_CODE_MECH_STATUS  = 81,
-    SSM5_ITEM_CODE_LOCK         = 82,
-    SSM5_ITEM_CODE_UNLOCK       = 83,
-    SSM5_ITEM_CODE_MOVE_TO,
-    SSM5_ITEM_CODE_DRIVE_DIRECTION,
-    SSM5_ITEM_CODE_STOP,
-    SSM5_ITEM_CODE_DETECT_DIR,
-    SSM5_ITEM_CODE_TOGGLE = 88,
-    SSM5_ITEM_CODE_CLICK  = 89,
-
-} ssm5_item_code_e;
+    SSM_ITEM_CODE_NONE                  = 0,
+    SSM_ITEM_CODE_REGISTRATION          = 1,
+    SSM_ITEM_CODE_LOGIN                 = 2,
+    SSM_ITEM_CODE_USER                  = 3,
+    SSM_ITEM_CODE_HISTORY               = 4,
+    SSM_ITEM_CODE_VERSION_DETAIL        = 5,
+    SSM_ITEM_CODE_DISCONNECT_REBOOT_NOW = 6,
+    SSM_ITEM_CODE_ENABLE_DFU            = 7,
+    SSM_ITEM_CODE_TIME                  = 8,
+    SSM_ITEM_CODE_INITIAL               = 14,
+    SSM_ITEM_CODE_MAGNET                = 17,
+    SSM_ITEM_CODE_MECH_SETTING          = 80,
+    SSM_ITEM_CODE_MECH_STATUS           = 81,
+    SSM_ITEM_CODE_LOCK                  = 82,
+    SSM_ITEM_CODE_UNLOCK                = 83,
+} ssm_item_code_e;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _CANDY_H_ */
+#endif /* __CANDY_H__ */

@@ -1,6 +1,6 @@
-# ESP32-C3 Sesame5 開關控制範例
+# ESP32-C3-DevKitM-1 Sesame5 開關控制範例
 
-這個專案展示了如何使用 ESP32-C3 微控制器來註冊和控制 Sesame5 智能鎖。本範例使用 ESP-IDF 開發框架，透過 BLE 技術自動尋找、連接並註冊附近的 Sesame5 設備。當 ESP32-C3 偵測到 Sesame5 達到開鎖位置時，會發出指令自動上鎖。
+這個專案展示了如何使用 ESP32-C3-DevKitM-1 微控制器來註冊和控制 Sesame5 智能鎖。本範例使用 ESP-IDF 開發框架，透過 BLE 技術自動尋找、連接並註冊附近的 Sesame5 設備。當 ESP32-C3-DevKitM-1 偵測到 Sesame5 達到開鎖位置時，會發出指令自動上鎖。
 
 ## 多語言版本
 - [English version](README_EN.md)
@@ -12,15 +12,15 @@
 ## 安裝與環境設定
 1. 請確保您已經通過 ESP-IDF 的 `install.sh` 安裝了工具鏈。
 2. 開啟終端機，導航到 ESP-IDF 的路徑，並執行 `export.sh` 加入環境變數。
-3. 將ESP32-C3透過USB連接到您的電腦。
+3. 將ESP32-C3-DevKitM-1透過USB連接到您的電腦。
 4. 回到專案資料夾，運行 `idf.py flash` 進行編譯和燒錄。
 
 ## 使用方法
-燒錄並重啟 ESP32-C3 後，它會自動搜尋附近的未註冊的Sesame設備。在連接並註冊後，ESP32-C3 會監聽 Sesame5 的狀態，並在適當的時機發送上鎖指令。
+燒錄並重啟 ESP32-C3-DevKitM-1 後，它會自動搜尋附近的未註冊的Sesame設備。在連接並註冊後，ESP32-C3-DevKitM-1 會監聽 Sesame5 的狀態，並在適當的時機發送上鎖指令。
 
 ## 特色與功能
 - **自動設備探索**：自動搜尋和連接附近的 Sesame5 智能鎖。
-- **自動上鎖**：當 Sesame5 達到預設開鎖位置時，ESP32-C3 會發出上鎖指令。
+- **自動上鎖**：當 Sesame5 達到預設開鎖位置時，ESP32-C3-DevKitM-1 會發出上鎖指令。
 
 ## 原始碼參考
 這個範例改自 ESP-IDF 內的 nimble BLE Central Example。
