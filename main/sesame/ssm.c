@@ -75,7 +75,7 @@ static void ssm_initial_handle(sesame * ssm, uint8_t cmd_it_code) {
     ssm->cipher.ssm.encrypt.count = 0;
     ssm->cipher.ssm.decrypt.count = 0;
 
-    if (p_ssms_env->ssm.device_secret[0] == 0) { // no device_secret
+    if (p_ssms_env->ssm.device_secret[0] == 0) {
         ESP_LOGI(TAG, "[ssm][no device_secret]");
         send_reg_cmd_to_ssm(ssm);
         return;
@@ -88,11 +88,9 @@ static void ssm_parse_publish(sesame * ssm, uint8_t cmd_it_code) {
         ssm_initial_handle(ssm, cmd_it_code);
     }
     if (cmd_it_code == SSM_ITEM_CODE_MECH_STATUS) {
-        // ESP_LOG_BUFFER_HEX_LEVEL("MECH_STATUS", ssm->b_buf, 32, ESP_LOG_INFO);
         bool isInLockRange       = (ssm->b_buf[6] & 2u) > 0u;
         bool isInUnlockRange     = (ssm->b_buf[6] & 4u) > 0u;
         device_status lockStatus = isInLockRange ? SSM_LOCKED : isInUnlockRange ? SSM_UNLOCKED : SSM_MOVED;
-        // ESP_LOGI("[ssm][mech_status]", "[%d][ssm][current lockStatus: %d][ssm->device_status: %d]", ssm->conn_id, lockStatus, ssm->device_status);
         memcpy(ssm->mech_status, ssm->b_buf, 7);
         if (ssm->device_status != lockStatus) {
             ssm->device_status = lockStatus;
@@ -141,7 +139,7 @@ void ssm_ble_receiver(sesame * ssm, const uint8_t * p_data, uint16_t len) {
     uint8_t cmd_it_code = ssm->b_buf[1];
     ssm->c_offset       = ssm->c_offset - 2;
     memcpy(ssm->b_buf, ssm->b_buf + 2, ssm->c_offset);
-    ESP_LOGI(TAG, "[ssm][say][%d][%s][%s]", ssm->conn_id,SSM_OP_CODE_STR(cmd_op_code), SSM_ITEM_CODE_STR(cmd_it_code));
+    ESP_LOGI(TAG, "[ssm][say][%d][%s][%s]", ssm->conn_id, SSM_OP_CODE_STR(cmd_op_code), SSM_ITEM_CODE_STR(cmd_it_code));
     if (cmd_op_code == SSM_OP_CODE_PUBLISH) {
         ssm_parse_publish(ssm, cmd_it_code);
     }

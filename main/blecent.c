@@ -201,19 +201,6 @@ static void blecent_host_task(void * param) {
     nimble_port_freertos_deinit();
 }
 
-void esp_ble_init(void) {
-    esp_err_t ret = nimble_port_init();
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to init nimble %d ", ret);
-        return;
-    }
-    ble_hs_cfg.sync_cb = blecent_scan;
-    int rc             = peer_init(SSM_MAX_NUM, 64, 64, 64);
-    assert(rc == 0);
-    nimble_port_freertos_init(blecent_host_task);
-    ESP_LOGI(TAG, "[esp_ble_init][SUCCESS]");
-}
-
 void esp_ble_gatt_write(sesame * ssm, uint8_t * value, uint16_t length) {
     const struct peer_chr * chr;
     const struct peer * peer;
@@ -230,4 +217,17 @@ void esp_ble_gatt_write(sesame * ssm, uint8_t * value, uint16_t length) {
                  "rc=%d\n",
                  rc);
     }
+}
+
+void esp_ble_init(void) {
+    esp_err_t ret = nimble_port_init();
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to init nimble %d ", ret);
+        return;
+    }
+    ble_hs_cfg.sync_cb = blecent_scan;
+    int rc             = peer_init(SSM_MAX_NUM, 64, 64, 64);
+    assert(rc == 0);
+    nimble_port_freertos_init(blecent_host_task);
+    ESP_LOGI(TAG, "[esp_ble_init][SUCCESS]");
 }
