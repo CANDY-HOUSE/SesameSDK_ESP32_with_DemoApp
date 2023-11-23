@@ -9,11 +9,11 @@ extern "C" {
 
 void send_read_history_cmd_to_ssm(sesame * ssm);
 
-void ssm_unlock_all(uint8_t * tag, uint8_t tag_length);
+void ssm_unlock(uint8_t * tag, uint8_t tag_length);
 
-void ssm_lock_all(uint8_t * tag, uint8_t tag_length);
+void ssm_lock(uint8_t * tag, uint8_t tag_length);
 
-void ssm_toggle_all(uint8_t * tag, uint8_t tag_length);
+void ssm_toggle(uint8_t * tag, uint8_t tag_length);
 
 void send_login_cmd_to_ssm(sesame * ssm);
 

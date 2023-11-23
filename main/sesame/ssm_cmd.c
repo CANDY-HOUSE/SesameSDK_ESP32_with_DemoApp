@@ -57,7 +57,8 @@ void send_read_history_cmd_to_ssm(sesame * ssm) {
     talk_to_ssm(ssm, SSM_SEG_PARSING_TYPE_CIPHERTEXT);
 }
 
-void ssm_lock(sesame * ssm, uint8_t * tag, uint8_t tag_length) {
+void ssm_lock(uint8_t * tag, uint8_t tag_length) {
+    sesame * ssm = &p_ssms_env->ssm;
     ESP_LOGI(TAG, "[ssm][lock][ssm->device_status: %d]", ssm->device_status);
     if (ssm->device_status >= SSM_LOGGIN) {
         if (tag_length == 0) {
@@ -72,7 +73,8 @@ void ssm_lock(sesame * ssm, uint8_t * tag, uint8_t tag_length) {
     }
 }
 
-void ssm_unlock(sesame * ssm, uint8_t * tag, uint8_t tag_length) {
+void ssm_unlock(uint8_t * tag, uint8_t tag_length) {
+    sesame * ssm = &p_ssms_env->ssm;
     ESP_LOGI(TAG, "[ssm][unlock][ssm->device_status: %d]", ssm->device_status);
     if (ssm->device_status >= SSM_LOGGIN) {
         if (tag_length == 0) {
@@ -87,21 +89,11 @@ void ssm_unlock(sesame * ssm, uint8_t * tag, uint8_t tag_length) {
     }
 }
 
-void ssm_unlock_all(uint8_t * tag, uint8_t tag_length) {
-    ESP_LOGI(TAG, "[ssm][ssm_unlock_all]");
-    ssm_unlock(&p_ssms_env->ssm, tag, tag_length);
-}
-
-void ssm_lock_all(uint8_t * tag, uint8_t tag_length) {
-    ESP_LOGI(TAG, "[ssm][ssm_lock_all]");
-    ssm_lock(&p_ssms_env->ssm, tag, tag_length);
-}
-
-void ssm_toggle_all(uint8_t * tag, uint8_t tag_length) {
-    ESP_LOGI(TAG, "[ssm][ssm_toggle_all]");
+void ssm_toggle(uint8_t * tag, uint8_t tag_length) {
+    ESP_LOGI(TAG, "[ssm][ssm_toggle]");
     if (p_ssms_env->ssm.device_status == SSM_LOCKED) {
-        ssm_unlock_all(tag, tag_length);
+        ssm_unlock(tag, tag_length);
     } else if (p_ssms_env->ssm.device_status == SSM_UNLOCKED) {
-        ssm_lock_all(tag, tag_length);
+        ssm_lock(tag, tag_length);
     }
 }
