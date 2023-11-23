@@ -7,12 +7,6 @@
 extern "C" {
 #endif
 
-#define SSM_MAX_CHAC_LEN (BLE_MAX_OCTETS - 4 - 3)
-#define CCM_TAG_LENGTH (4)
-
-#define SSM_SEG_PARSING_TYPE_APPEND_ONLY (0)
-#define SSM_SEG_PARSING_TYPE_PLAINTEXT (1)
-#define SSM_SEG_PARSING_TYPE_CIPHERTEXT (2)
 #define SSM_OP_CODE_STR(op_code) ((op_code) == 7 ? "response" : (op_code) == 8 ? "publish" : "unknown")
 #define SSM_ITEM_CODE_STR(code)                                                                                                                                                                                                                               \
     ((code) == SSM_ITEM_CODE_NONE                        ? "SSM_ITEM_CODE_NONE"                                                                                                                                                                               \
@@ -42,6 +36,14 @@ extern "C" {
          : (status) == SSM_UNLOCKED     ? "UNLOCKED"                                                                                                                                                                                                          \
          : (status) == SSM_MOVED        ? "MOVED"                                                                                                                                                                                                             \
                                         : "status_error")
+
+#define SSM_MAX_CHAC_LEN (BLE_MAX_OCTETS - 4 - 3)
+#define CCM_TAG_LENGTH (4)
+
+#define SSM_SEG_PARSING_TYPE_APPEND_ONLY (0)
+#define SSM_SEG_PARSING_TYPE_PLAINTEXT (1)
+#define SSM_SEG_PARSING_TYPE_CIPHERTEXT (2)
+
 typedef enum {
     SESAME_5      = 5,
     SESAME_BIKE_2 = 6,
