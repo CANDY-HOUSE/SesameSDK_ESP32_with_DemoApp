@@ -72,7 +72,6 @@ static int ble_gap_event_connect_handle(struct ble_gap_event * event, void * arg
         ESP_LOGE(TAG, "Error: Connection failed; status=%d\n", event->connect.status);
         return ESP_FAIL;
     }
-
     int rc = ble_gap_conn_find(event->connect.conn_handle, desc);
     assert(rc == 0);
     print_conn_desc(desc);
@@ -81,17 +80,14 @@ static int ble_gap_event_connect_handle(struct ble_gap_event * event, void * arg
         ESP_LOGE(TAG, "Failed to add peer; rc=%d\n", rc);
         return ESP_FAIL;
     }
+    p_ssms_env->ssm.device_status = SSM_CONNECTED;              // set the device status
+    p_ssms_env->ssm.conn_id       = event->connect.conn_handle; // save the connection handle
     ESP_LOGW(TAG, "Connect SSM success handle=%d", event->connect.conn_handle);
-    if (memcmp(p_ssms_env->ssm.addr, (*desc).peer_id_addr.val, 6) == 0) {
-        p_ssms_env->ssm.device_status = SSM_CONNECTED;              // set the device status
-        p_ssms_env->ssm.conn_id       = event->connect.conn_handle; // save the connection handle
-    }
     rc = peer_disc_all(event->connect.conn_handle, blecent_on_service_disc_complete, NULL);
     if (rc != 0) {
         ESP_LOGE(TAG, "Failed to discover services; rc=%d\n", rc);
         return ESP_FAIL;
     }
-
     return ESP_OK;
 }
 
@@ -105,23 +101,24 @@ static int ble_gap_connect_event(struct ble_gap_event * event, void * arg) {
         return ble_gap_event_connect_handle(event, arg, &desc);
 
     case BLE_GAP_EVENT_DISCONNECT:
-        ESP_LOGI(TAG, "disconnect; reason=%d ", event->disconnect.reason);
+        ESP_LOGW(TAG, "disconnect; reason=%d ", event->disconnect.reason);
         print_conn_desc(&event->disconnect.conn);
         peer_delete(event->disconnect.conn.conn_handle);
         return ESP_OK;
 
     case BLE_GAP_EVENT_CONN_UPDATE_REQ:
-        printf("connection update request event; "
-               "conn_handle=%d itvl_min=%d itvl_max=%d "
-               "latency=%d supervision_timoeut=%d "
-               "min_ce_len=%d max_ce_len=%d\n",
-               event->conn_update_req.conn_handle, event->conn_update_req.peer_params->itvl_min, event->conn_update_req.peer_params->itvl_max, event->conn_update_req.peer_params->latency, event->conn_update_req.peer_params->supervision_timeout,
-               event->conn_update_req.peer_params->min_ce_len, event->conn_update_req.peer_params->max_ce_len);
+        ESP_LOGI(TAG,
+                 "connection update request event; "
+                 "conn_handle=%d itvl_min=%d itvl_max=%d "
+                 "latency=%d supervision_timoeut=%d "
+                 "min_ce_len=%d max_ce_len=%d\n",
+                 event->conn_update_req.conn_handle, event->conn_update_req.peer_params->itvl_min, event->conn_update_req.peer_params->itvl_max, event->conn_update_req.peer_params->latency, event->conn_update_req.peer_params->supervision_timeout,
+                 event->conn_update_req.peer_params->min_ce_len, event->conn_update_req.peer_params->max_ce_len);
         *event->conn_update_req.self_params = *event->conn_update_req.peer_params;
         return ESP_OK;
 
     case BLE_GAP_EVENT_NOTIFY_RX:
-        ssm_say_handler(event->notify_rx.om->om_data, event->notify_rx.om->om_len, event->notify_rx.conn_handle); // talk to sesame
+        ssm_ble_receiver(&p_ssms_env->ssm, event->notify_rx.om->om_data, event->notify_rx.om->om_len);
         return ESP_OK;
 
     case BLE_GAP_EVENT_MTU:

@@ -122,7 +122,7 @@ static void ssm_parse_response(sesame * ssm, uint8_t cmd_it_code) {
     }
 }
 
-static void ssm_ble_receiver(sesame * ssm, const uint8_t * p_data, uint16_t len) {
+void ssm_ble_receiver(sesame * ssm, const uint8_t * p_data, uint16_t len) {
     if (p_data[0] & 1u) {
         ssm->c_offset = 0;
     }
@@ -149,10 +149,4 @@ static void ssm_ble_receiver(sesame * ssm, const uint8_t * p_data, uint16_t len)
         ssm_parse_response(ssm, cmd_it_code);
     }
     ssm->c_offset = 0;
-}
-
-void ssm_say_handler(const uint8_t * p_data, uint16_t len, uint8_t conn_id) {
-    if (p_ssms_env->ssm.conn_id == conn_id) {
-        ssm_ble_receiver(&p_ssms_env->ssm, p_data, len);
-    }
 }
