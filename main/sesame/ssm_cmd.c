@@ -65,6 +65,8 @@ void ssm_lock_unlock(uint8_t cmd, uint8_t * tag, uint8_t tag_length) {
             ssm->b_buf[0] = cmd;
         } else if (cmd == SSM_ITEM_CODE_UNLOCK) {
             ssm->b_buf[0] = cmd;
+        } else {
+            return;
         }
         if (tag_length == 0) {
             tag        = tag_esp32;
@@ -74,14 +76,5 @@ void ssm_lock_unlock(uint8_t cmd, uint8_t * tag, uint8_t tag_length) {
         ssm->c_offset = tag_length + 2;
         memcpy(ssm->b_buf + 2, tag, tag_length);
         talk_to_ssm(ssm, SSM_SEG_PARSING_TYPE_CIPHERTEXT);
-    }
-}
-
-void ssm_toggle(uint8_t * tag, uint8_t tag_length) {
-    ESP_LOGI(TAG, "[ssm][ssm_toggle]");
-    if (p_ssms_env->ssm.device_status == SSM_LOCKED) {
-        ssm_lock_unlock(SSM_ITEM_CODE_UNLOCK, tag, tag_length);
-    } else if (p_ssms_env->ssm.device_status == SSM_UNLOCKED) {
-        ssm_lock_unlock(SSM_ITEM_CODE_LOCK, tag, tag_length);
     }
 }

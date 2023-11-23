@@ -16,7 +16,7 @@ static void ssm_action_handle(sesame * ssm) {
         ESP_LOGI(TAG, "ssm->device_status == SSM_LOCKED");
     } else if (ssm->device_status == SSM_UNLOCKED) {
         ESP_LOGI(TAG, "ssm->device_status == SSM_UNLOCKED");
-        ssm_toggle(NULL, 0);
+        ssm_lock_unlock(SSM_ITEM_CODE_LOCK, NULL, 0);
     }
 }
 
