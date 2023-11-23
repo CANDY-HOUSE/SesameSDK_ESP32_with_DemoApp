@@ -5,7 +5,8 @@
 #include "uECC.h"
 #include <string.h>
 
-static const char * TAG          = "ssm_cmd.c";
+static const char * TAG = "ssm_cmd.c";
+
 static const uint8_t tag_esp32[] = { 'S', 'E', 'S', 'A', 'M', 'E', ' ', 'E', 'S', 'P', '3', '2' };
 
 static uint8_t ecc_private_esp32[32];
