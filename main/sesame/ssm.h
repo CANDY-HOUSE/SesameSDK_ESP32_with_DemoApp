@@ -20,7 +20,7 @@ typedef struct {
 } SSM_CCM_NONCE;
 
 typedef struct {
-    uint8_t ccm_key[16];
+    uint8_t token[16];
     SSM_CCM_NONCE encrypt;
     SSM_CCM_NONCE decrypt;
 } SesameBleCipher;

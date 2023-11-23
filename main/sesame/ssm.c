@@ -29,7 +29,7 @@ void talk_to_ssm(sesame * ssm, uint8_t parsing_type) {
     ESP_LOGI(TAG, "[%x][talk_to_ssm] => [ssm->c_offset: %d]", ssm->conn_id, ssm->c_offset);
     ESP_LOG_BUFFER_HEX_LEVEL("[esp32][say]", ssm->b_buf, ssm->c_offset, ESP_LOG_INFO);
     if (parsing_type == SSM_SEG_PARSING_TYPE_CIPHERTEXT) {
-        aes_ccm_encrypt_and_tag(ssm->cipher.ssm.ccm_key, (const unsigned char *) &ssm->cipher.ssm.encrypt, 13, additional_data, 1, ssm->b_buf, ssm->c_offset, ssm->b_buf, ssm->b_buf + ssm->c_offset, CCM_TAG_LENGTH);
+        aes_ccm_encrypt_and_tag(ssm->cipher.ssm.token, (const unsigned char *) &ssm->cipher.ssm.encrypt, 13, additional_data, 1, ssm->b_buf, ssm->c_offset, ssm->b_buf, ssm->b_buf + ssm->c_offset, CCM_TAG_LENGTH);
         ssm->cipher.ssm.encrypt.count++;
         ssm->c_offset = ssm->c_offset + CCM_TAG_LENGTH;
     }
@@ -134,7 +134,7 @@ static void ssm_ble_receiver(sesame * ssm, const uint8_t * p_data, uint16_t len)
     }
     if (p_data[0] >> 1u == SSM_SEG_PARSING_TYPE_CIPHERTEXT) {
         ssm->c_offset = ssm->c_offset - CCM_TAG_LENGTH;
-        aes_ccm_auth_decrypt(ssm->cipher.ssm.ccm_key, (const unsigned char *) &ssm->cipher.ssm.decrypt, 13, additional_data, 1, ssm->b_buf, ssm->c_offset, ssm->b_buf, ssm->b_buf + ssm->c_offset, CCM_TAG_LENGTH);
+        aes_ccm_auth_decrypt(ssm->cipher.ssm.token, (const unsigned char *) &ssm->cipher.ssm.decrypt, 13, additional_data, 1, ssm->b_buf, ssm->c_offset, ssm->b_buf, ssm->b_buf + ssm->c_offset, CCM_TAG_LENGTH);
         ssm->cipher.ssm.decrypt.count++;
     }
 
