@@ -3,7 +3,7 @@
 #include "c_ccm.h"
 #include "ssm_cmd.h"
 
-static const char * TAG = "ssm_link.c";
+static const char * TAG = "ssm.c";
 
 static uint8_t additional_data[] = { 0x00 };
 
