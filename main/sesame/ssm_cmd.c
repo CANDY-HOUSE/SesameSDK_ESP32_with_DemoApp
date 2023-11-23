@@ -88,25 +88,19 @@ void ssm_unlock(sesame * ssm, uint8_t * tag, uint8_t tag_length) {
 
 void ssm_unlock_all(uint8_t * tag, uint8_t tag_length) {
     ESP_LOGI(TAG, "[ssm][ssm_unlock_all]");
-    for (int i = 0; i < SSM_MAX_NUM; ++i) {
-        ssm_unlock(&p_ssms_env->ssm[i], tag, tag_length);
-    }
+    ssm_unlock(&p_ssms_env->ssm, tag, tag_length);
 }
 
 void ssm_lock_all(uint8_t * tag, uint8_t tag_length) {
     ESP_LOGI(TAG, "[ssm][ssm_lock_all]");
-    for (int i = 0; i < SSM_MAX_NUM; ++i) {
-        ssm_lock(&p_ssms_env->ssm[i], tag, tag_length);
-    }
+    ssm_lock(&p_ssms_env->ssm, tag, tag_length);
 }
 
 void ssm_toggle_all(uint8_t * tag, uint8_t tag_length) {
     ESP_LOGI(TAG, "[ssm][ssm_toggle_all]");
-    for (int i = 0; i < SSM_MAX_NUM; ++i) {
-        if (p_ssms_env->ssm[i].device_status == SSM_LOCKED) {
-            ssm_unlock_all(tag, tag_length);
-        } else if (p_ssms_env->ssm[i].device_status == SSM_UNLOCKED) {
-            ssm_lock_all(tag, tag_length);
-        }
+    if (p_ssms_env->ssm.device_status == SSM_LOCKED) {
+        ssm_unlock_all(tag, tag_length);
+    } else if (p_ssms_env->ssm.device_status == SSM_UNLOCKED) {
+        ssm_lock_all(tag, tag_length);
     }
 }

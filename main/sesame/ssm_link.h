@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-#define SSM_MAX_NUM (4u)
+#define SSM_MAX_NUM (1u)
 
 #pragma pack(1)
 
@@ -45,7 +45,7 @@ typedef struct {
 typedef void (*ssm_action)(sesame * ssm);
 
 struct ssm_env_tag {
-    sesame ssm[SSM_MAX_NUM];
+    sesame ssm;
     uint8_t number;
     ssm_action ssm_cb__;
 };

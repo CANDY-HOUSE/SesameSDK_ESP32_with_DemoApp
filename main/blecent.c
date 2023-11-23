@@ -8,8 +8,7 @@
 #include "nimble/nimble_port_freertos.h"
 #include "services/gap/ble_svc_gap.h"
 
-// https://github.com/CANDY-HOUSE/Sesame_BluetoothAPI_document/blob/master/SesameOS3/1_advertising.md
-#define BLECENT_SVC_ALERT_UUID (0xFD81)
+#define BLECENT_SVC_ALERT_UUID (0xFD81) // https://github.com/CANDY-HOUSE/Sesame_BluetoothAPI_document/blob/master/SesameOS3/1_advertising.md
 
 struct ble_hs_adv_fields;
 struct ble_gap_conn_desc;
@@ -86,15 +85,11 @@ static int ble_gap_event_connect_handle(struct ble_gap_event * event, void * arg
         return ESP_FAIL;
     }
     ESP_LOGI(TAG, "ssm conn_id: %d", event->connect.conn_handle);
-    for (uint8_t i = 0; i < SSM_MAX_NUM; i++) {
-        ESP_LOGI(TAG, "ssm[%d].addr", i);
-        ESP_LOG_BUFFER_HEX_LEVEL("[ssm.addr]", p_ssms_env->ssm[i].addr, 6, ESP_LOG_INFO);
-        if (memcmp(p_ssms_env->ssm[i].addr, (*desc).peer_id_addr.val, 6) == 0) {
-            ESP_LOGI(TAG, "ssm[%d] connected", i);
-            p_ssms_env->ssm[i].device_status = SSM_CONNECTED;              // set the device status
-            p_ssms_env->ssm[i].conn_id       = event->connect.conn_handle; // save the connection handle
-            break;
-        }
+    ESP_LOG_BUFFER_HEX_LEVEL("[ssm.addr]", p_ssms_env->ssm.addr, 6, ESP_LOG_INFO);
+    if (memcmp(p_ssms_env->ssm.addr, (*desc).peer_id_addr.val, 6) == 0) {
+        ESP_LOGI(TAG, "ssm connected");
+        p_ssms_env->ssm.device_status = SSM_CONNECTED;              // set the device status
+        p_ssms_env->ssm.conn_id       = event->connect.conn_handle; // save the connection handle
     }
     rc = peer_disc_all(event->connect.conn_handle, blecent_on_service_disc_complete, NULL);
     if (rc != 0) {
@@ -160,12 +155,10 @@ static void blecent_connect_sesame(const struct ble_hs_adv_fields * fields, void
         if (fields->mfg_data[4] == 0x00) {                            // unregistered SSM
             ESP_LOGI(TAG, "find unregistered SSM[%d]", fields->mfg_data[2]);
             ESP_LOG_BUFFER_HEX_LEVEL("find SSM", addr->val, 6, ESP_LOG_INFO);
-            for (int i = 0; i < SSM_MAX_NUM; ++i) {
-                if (p_ssms_env->ssm[i].device_status == SSM_NOUSE) {
-                    memcpy(p_ssms_env->ssm[i].addr, addr->val, 6);
-                    p_ssms_env->ssm[i].device_status = SSM_DISCONNECTED;
-                    p_ssms_env->ssm[i].conn_id       = 0xFF;
-                }
+            if (p_ssms_env->ssm.device_status == SSM_NOUSE) {
+                memcpy(p_ssms_env->ssm.addr, addr->val, 6);
+                p_ssms_env->ssm.device_status = SSM_DISCONNECTED;
+                p_ssms_env->ssm.conn_id       = 0xFF;
             }
         } else { // registered SSM
             ESP_LOGW(TAG, "find registered SSM[%d]", fields->mfg_data[2]);

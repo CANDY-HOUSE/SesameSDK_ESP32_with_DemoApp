@@ -24,12 +24,10 @@ static void ssm_mem_init(void) {
 }
 
 void ssm_init(ssm_action ssm_action_cb) {
-    ssm_mem_init();                       // malloc p_ssms_env
-    p_ssms_env->ssm_cb__ = ssm_action_cb; // callback: ssm_action_handle
-    for (int i = 0; i < SSM_MAX_NUM; ++i) {
-        p_ssms_env->ssm[i].device_status = SSM_NOUSE;
-        p_ssms_env->ssm[i].conn_id       = 0xFF; // 0xFF: not connected
-    }
+    ssm_mem_init();                                // malloc p_ssms_env
+    p_ssms_env->ssm_cb__          = ssm_action_cb; // callback: ssm_action_handle
+    p_ssms_env->ssm.device_status = SSM_NOUSE;
+    p_ssms_env->ssm.conn_id       = 0xFF; // 0xFF: not connected
 }
 
 void talk_to_ssm(sesame * ssm, uint8_t parsing_type) {
@@ -81,14 +79,7 @@ static void ssm_initial_handle(sesame * ssm, uint8_t cmd_it_code) {
     ssm->cipher.ssm.encrypt.count = 0;
     ssm->cipher.ssm.decrypt.count = 0;
 
-    uint8_t null_ssm_count = 0;
-    for (uint8_t i = 0; i < SSM_MAX_NUM; i++) {
-        if (p_ssms_env->ssm[i].device_secret[i] == 0) {
-            null_ssm_count++;
-        }
-    }
-    ESP_LOGI(TAG, "[ssm][null_ssm_count: %d]", null_ssm_count);
-    if (null_ssm_count == SSM_MAX_NUM) { // no device_secret
+    if (p_ssms_env->ssm.device_secret[0] == 0) { // no device_secret
         ESP_LOGI(TAG, "[ssm][no device_secret]");
         send_reg_cmd_to_ssm(ssm);
         return;
@@ -168,10 +159,7 @@ static void ssm_ble_receiver(sesame * ssm, const uint8_t * p_data, uint16_t len)
 }
 
 void ssm_say_handler(const uint8_t * p_data, uint16_t len, uint8_t conn_id) {
-    for (int i = 0; i < SSM_MAX_NUM; ++i) {
-        if (p_ssms_env->ssm[i].conn_id == conn_id) {
-            ssm_ble_receiver(&p_ssms_env->ssm[i], p_data, len);
-            break;
-        }
+    if (p_ssms_env->ssm.conn_id == conn_id) {
+        ssm_ble_receiver(&p_ssms_env->ssm, p_data, len);
     }
 }
