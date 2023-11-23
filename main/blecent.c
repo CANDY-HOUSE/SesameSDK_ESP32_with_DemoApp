@@ -34,7 +34,7 @@ static int blecent_on_write(uint16_t conn_handle) {
                  "Status characteristic\n");
         goto err;
     }
-    ESP_LOGI("blecent_on_write", "[conn_handle: %d][dsc->dsc.handle: %d]", conn_handle, dsc->dsc.handle);
+    // ESP_LOGI(TAG, "[conn_handle:%d][notify_handle:%d]", conn_handle, dsc->dsc.handle);
     value[0] = 1;
     value[1] = 0;
     int rc   = ble_gattc_write_flat(conn_handle, dsc->dsc.handle, value, sizeof value, NULL, NULL);
@@ -45,13 +45,13 @@ static int blecent_on_write(uint16_t conn_handle) {
                  rc);
         goto err;
     }
+    ESP_LOGW(TAG, "Enable notify success!!");
     return ESP_OK;
 err:
     return ble_gap_terminate(peer->conn_handle, BLE_ERR_REM_USER_CONN_TERM); /* Terminate the connection. */
 }
 
 static void blecent_on_service_disc_complete(const struct peer * peer, int status, void * arg) {
-    ESP_LOGI(TAG, "blecent_on_service_disc_complete");
     if (status != 0) {
         ESP_LOGE(TAG,
                  "Error: Service discovery failed; status=%d "
@@ -68,26 +68,21 @@ static void blecent_on_service_disc_complete(const struct peer * peer, int statu
 }
 
 static int ble_gap_event_connect_handle(struct ble_gap_event * event, void * arg, struct ble_gap_conn_desc * desc) {
-    ESP_LOGI(TAG, "[conn_handle: %d][event->connect.status: %d]", event->connect.conn_handle, event->connect.status);
     if (event->connect.status != 0) {
         ESP_LOGE(TAG, "Error: Connection failed; status=%d\n", event->connect.status);
         return ESP_FAIL;
     }
 
-    ESP_LOGI(TAG, "Connection established ");
     int rc = ble_gap_conn_find(event->connect.conn_handle, desc);
     assert(rc == 0);
     print_conn_desc(desc);
-    ESP_LOGI(TAG, "get peer info success");
     rc = peer_add(event->connect.conn_handle);
     if (rc != 0) {
         ESP_LOGE(TAG, "Failed to add peer; rc=%d\n", rc);
         return ESP_FAIL;
     }
-    ESP_LOGI(TAG, "ssm conn_id: %d", event->connect.conn_handle);
-    ESP_LOG_BUFFER_HEX_LEVEL("[ssm.addr]", p_ssms_env->ssm.addr, 6, ESP_LOG_INFO);
+    ESP_LOGW(TAG, "Connect SSM success handle=%d", event->connect.conn_handle);
     if (memcmp(p_ssms_env->ssm.addr, (*desc).peer_id_addr.val, 6) == 0) {
-        ESP_LOGI(TAG, "ssm connected");
         p_ssms_env->ssm.device_status = SSM_CONNECTED;              // set the device status
         p_ssms_env->ssm.conn_id       = event->connect.conn_handle; // save the connection handle
     }
@@ -153,15 +148,14 @@ static void blecent_connect_sesame(const struct ble_hs_adv_fields * fields, void
     }
     if (fields->mfg_data[0] == 0x5A && fields->mfg_data[1] == 0x05) { // is SSM
         if (fields->mfg_data[4] == 0x00) {                            // unregistered SSM
-            ESP_LOGI(TAG, "find unregistered SSM[%d]", fields->mfg_data[2]);
-            ESP_LOG_BUFFER_HEX_LEVEL("find SSM", addr->val, 6, ESP_LOG_INFO);
+            ESP_LOGW(TAG, "find unregistered SSM[%d]", fields->mfg_data[2]);
             if (p_ssms_env->ssm.device_status == SSM_NOUSE) {
                 memcpy(p_ssms_env->ssm.addr, addr->val, 6);
                 p_ssms_env->ssm.device_status = SSM_DISCONNECTED;
                 p_ssms_env->ssm.conn_id       = 0xFF;
             }
         } else { // registered SSM
-            ESP_LOGW(TAG, "find registered SSM[%d]", fields->mfg_data[2]);
+            ESP_LOGI(TAG, "find registered SSM[%d]", fields->mfg_data[2]);
             return;
         }
     } else { // not SSM
@@ -170,7 +164,7 @@ static void blecent_connect_sesame(const struct ble_hs_adv_fields * fields, void
     }
     ble_gap_disc_cancel(); /* Scanning must be stopped before a connection can be nitiated. */
     addr = &((struct ble_gap_disc_desc *) disc)->addr;
-    ESP_LOGI(TAG, "addr_type=%d addr=%s", addr->type, addr_str(addr->val));
+    ESP_LOGW(TAG, "Connect SSM addr=%s addrType=%d", addr_str(addr->val), addr->type);
     int rc = ble_gap_connect(BLE_OWN_ADDR_PUBLIC, addr, 10000, NULL, ble_gap_connect_event, NULL);
     if (rc != 0) {
         ESP_LOGE(TAG, "Error: Failed to connect to device; rc=%d\n", rc);
@@ -179,7 +173,7 @@ static void blecent_connect_sesame(const struct ble_hs_adv_fields * fields, void
 }
 
 static int ble_gap_disc_event(struct ble_gap_event * event, void * arg) {
-    // ESP_LOGI(TAG, "[ble_gap_disc_event: %d]", event->type);
+    // ESP_LOG_BUFFER_HEX_LEVEL("[find_device_mac]", event->disc.addr.val, 6, ESP_LOG_WARN);
     struct ble_hs_adv_fields fields;
     int rc = ble_hs_adv_parse_fields(&fields, event->disc.data, event->disc.length_data);
     if (rc != 0) {
@@ -190,8 +184,7 @@ static int ble_gap_disc_event(struct ble_gap_event * event, void * arg) {
 }
 
 static void blecent_scan(void) {
-    ESP_LOGI("[conn_ssm]", "esp32 central scan device");
-
+    ESP_LOGI(TAG, "[blecent_scan][START]");
     struct ble_gap_disc_params disc_params;
     disc_params.filter_duplicates = 1;
     disc_params.passive           = 1;
@@ -221,6 +214,7 @@ void esp_ble_init(void) {
     int rc             = peer_init(SSM_MAX_NUM, 64, 64, 64);
     assert(rc == 0);
     nimble_port_freertos_init(blecent_host_task);
+    ESP_LOGI(TAG, "[esp_ble_init][SUCCESS]");
 }
 
 void esp_ble_gatt_write(sesame * ssm, uint8_t * value, uint16_t length) {

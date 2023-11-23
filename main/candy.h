@@ -13,7 +13,35 @@ extern "C" {
 #define SSM_SEG_PARSING_TYPE_APPEND_ONLY (0)
 #define SSM_SEG_PARSING_TYPE_PLAINTEXT (1)
 #define SSM_SEG_PARSING_TYPE_CIPHERTEXT (2)
-
+#define SSM_OP_CODE_STR(op_code) ((op_code) == 7 ? "response" : (op_code) == 8 ? "publish" : "unknown")
+#define SSM_ITEM_CODE_STR(code)                                                                                                                                                                                                                               \
+    ((code) == SSM_ITEM_CODE_NONE                        ? "SSM_ITEM_CODE_NONE"                                                                                                                                                                               \
+         : (code) == SSM_ITEM_CODE_REGISTRATION          ? "SSM_ITEM_CODE_REGISTRATION"                                                                                                                                                                       \
+         : (code) == SSM_ITEM_CODE_LOGIN                 ? "SSM_ITEM_CODE_LOGIN"                                                                                                                                                                              \
+         : (code) == SSM_ITEM_CODE_USER                  ? "SSM_ITEM_CODE_USER"                                                                                                                                                                               \
+         : (code) == SSM_ITEM_CODE_HISTORY               ? "SSM_ITEM_CODE_HISTORY"                                                                                                                                                                            \
+         : (code) == SSM_ITEM_CODE_VERSION_DETAIL        ? "SSM_ITEM_CODE_VERSION_DETAIL"                                                                                                                                                                     \
+         : (code) == SSM_ITEM_CODE_DISCONNECT_REBOOT_NOW ? "SSM_ITEM_CODE_DISCONNECT_REBOOT_NOW"                                                                                                                                                              \
+         : (code) == SSM_ITEM_CODE_ENABLE_DFU            ? "SSM_ITEM_CODE_ENABLE_DFU"                                                                                                                                                                         \
+         : (code) == SSM_ITEM_CODE_TIME                  ? "SSM_ITEM_CODE_TIME"                                                                                                                                                                               \
+         : (code) == SSM_ITEM_CODE_INITIAL               ? "SSM_ITEM_CODE_INITIAL"                                                                                                                                                                            \
+         : (code) == SSM_ITEM_CODE_MAGNET                ? "SSM_ITEM_CODE_MAGNET"                                                                                                                                                                             \
+         : (code) == SSM_ITEM_CODE_MECH_SETTING          ? "SSM_ITEM_CODE_MECH_SETTING"                                                                                                                                                                       \
+         : (code) == SSM_ITEM_CODE_MECH_STATUS           ? "SSM_ITEM_CODE_MECH_STATUS"                                                                                                                                                                        \
+         : (code) == SSM_ITEM_CODE_LOCK                  ? "SSM_ITEM_CODE_LOCK"                                                                                                                                                                               \
+         : (code) == SSM_ITEM_CODE_UNLOCK                ? "SSM_ITEM_CODE_UNLOCK"                                                                                                                                                                             \
+                                                         : "UNKNOWN_ITEM_CODE")
+#define SSM_STATUS_STR(status)                                                                                                                                                                                                                                \
+    ((status) == SSM_NOUSE              ? "NOUSE"                                                                                                                                                                                                             \
+         : (status) == SSM_DISCONNECTED ? "DISCONNECTED"                                                                                                                                                                                                      \
+         : (status) == SSM_SCANNING     ? "SCANNING"                                                                                                                                                                                                          \
+         : (status) == SSM_CONNECTING   ? "CONNECTING"                                                                                                                                                                                                        \
+         : (status) == SSM_CONNECTED    ? "CONNECTED"                                                                                                                                                                                                         \
+         : (status) == SSM_LOGGIN       ? "LOGGIN"                                                                                                                                                                                                            \
+         : (status) == SSM_LOCKED       ? "LOCKED"                                                                                                                                                                                                            \
+         : (status) == SSM_UNLOCKED     ? "UNLOCKED"                                                                                                                                                                                                          \
+         : (status) == SSM_MOVED        ? "MOVED"                                                                                                                                                                                                             \
+                                        : "status_error")
 typedef enum {
     SESAME_5      = 5,
     SESAME_BIKE_2 = 6,
@@ -31,18 +59,6 @@ typedef enum {
     SSM_UNLOCKED     = 7,
     SSM_MOVED        = 8,
 } device_status;
-
-#define SSM_STATUS_STR(status)                                                                                                                                                                                                                                \
-    ((status) == SSM_NOUSE              ? "NOUSE"                                                                                                                                                                                                             \
-         : (status) == SSM_DISCONNECTED ? "DISCONNECTED"                                                                                                                                                                                                      \
-         : (status) == SSM_SCANNING     ? "SCANNING"                                                                                                                                                                                                          \
-         : (status) == SSM_CONNECTING   ? "CONNECTING"                                                                                                                                                                                                        \
-         : (status) == SSM_CONNECTED    ? "CONNECTED"                                                                                                                                                                                                         \
-         : (status) == SSM_LOGGIN       ? "LOGGIN"                                                                                                                                                                                                            \
-         : (status) == SSM_LOCKED       ? "LOCKED"                                                                                                                                                                                                            \
-         : (status) == SSM_UNLOCKED     ? "UNLOCKED"                                                                                                                                                                                                          \
-         : (status) == SSM_MOVED        ? "MOVED"                                                                                                                                                                                                             \
-                                        : "status_error")
 
 typedef enum {
     SSM_OP_CODE_RESPONSE = 0x07,

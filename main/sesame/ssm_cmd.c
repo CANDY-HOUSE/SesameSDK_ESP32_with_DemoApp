@@ -17,7 +17,7 @@ static int crypto_backend_micro_ecc_rng_callback(uint8_t * dest, unsigned size) 
 }
 
 void send_reg_cmd_to_ssm(sesame * ssm) {
-    ESP_LOGI(TAG, "[ssm][register][->]");
+    ESP_LOGW(TAG, "[esp32->ssm][register]");
     uECC_set_rng(crypto_backend_micro_ecc_rng_callback);
     uint8_t ecc_public_esp32[64];
     uECC_make_key_lit(ecc_public_esp32, ecc_private_esp32, uECC_secp256r1());
@@ -28,13 +28,12 @@ void send_reg_cmd_to_ssm(sesame * ssm) {
 }
 
 void handle_reg_data_from_ssm(sesame * ssm) {
-    ESP_LOGI(TAG, "[ssm][register][<-]");
+    ESP_LOGW(TAG, "[esp32<-ssm][register]");
     memcpy(ssm->public_key, &ssm->b_buf[13], 64);
-    // ESP_LOG_BUFFER_HEX("public_key", ssm->public_key, 64);
     uint8_t ecdh_secret_ssm[32];
     uECC_shared_secret_lit(ssm->public_key, ecc_private_esp32, ecdh_secret_ssm, uECC_secp256r1());
     memcpy(ssm->device_secret, ecdh_secret_ssm, 16); // ssm device_secret
-    ESP_LOG_BUFFER_HEX("deviceSecret", ssm->device_secret, 16);
+    // ESP_LOG_BUFFER_HEX("deviceSecret", ssm->device_secret, 16);
     AES_CMAC(ssm->device_secret, (const unsigned char *) ssm->cipher.ssm.decrypt.random_code, 4, ssm->cipher.ssm.token);
     ssm->device_status = SSM_LOGGIN;
     p_ssms_env->ssm_cb__(ssm);
@@ -59,7 +58,6 @@ void send_read_history_cmd_to_ssm(sesame * ssm) {
 
 void ssm_lock_unlock(uint8_t cmd, uint8_t * tag, uint8_t tag_length) {
     sesame * ssm = &p_ssms_env->ssm;
-    ESP_LOGI(TAG, "[ssm][unlock][ssm->device_status: %d]", ssm->device_status);
     if (ssm->device_status >= SSM_LOGGIN) {
         if (cmd == SSM_ITEM_CODE_LOCK) {
             ssm->b_buf[0] = cmd;

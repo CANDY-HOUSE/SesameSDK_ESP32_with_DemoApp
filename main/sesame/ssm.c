@@ -16,18 +16,20 @@ void ssm_mem_deinit(void) {
 void ssm_init(ssm_action ssm_action_cb) {
     p_ssms_env = (struct ssm_env_tag *) malloc(sizeof(struct ssm_env_tag));
     if (p_ssms_env == NULL) {
-        ESP_LOGE(TAG, "[p_ssms_env][FAIL]");
+        ESP_LOGE(TAG, "[ssm_init][FAIL]");
     }
     memset(p_ssms_env, 0, sizeof(struct ssm_env_tag));
     p_ssms_env->number            = 0;
     p_ssms_env->ssm_cb__          = ssm_action_cb; // callback: ssm_action_handle
     p_ssms_env->ssm.conn_id       = 0xFF;          // 0xFF: not connected
     p_ssms_env->ssm.device_status = SSM_NOUSE;
+    ESP_LOGI(TAG, "[ssm_init][SUCCESS]");
 }
 
 void talk_to_ssm(sesame * ssm, uint8_t parsing_type) {
-    ESP_LOGI(TAG, "[%x][talk_to_ssm] => [ssm->c_offset: %d]", ssm->conn_id, ssm->c_offset);
-    ESP_LOG_BUFFER_HEX_LEVEL("[esp32][say]", ssm->b_buf, ssm->c_offset, ESP_LOG_INFO);
+    ESP_LOGI(TAG, "[esp32][say][%d][%s]", ssm->conn_id, SSM_ITEM_CODE_STR(ssm->b_buf[0]));
+    // ESP_LOGI(TAG, "[talk_to_ssm][conn_id:%d][len:%d]", ssm->conn_id, ssm->c_offset);
+    // ESP_LOG_BUFFER_HEX_LEVEL("[esp32][say]", ssm->b_buf, ssm->c_offset, ESP_LOG_INFO);
     if (parsing_type == SSM_SEG_PARSING_TYPE_CIPHERTEXT) {
         aes_ccm_encrypt_and_tag(ssm->cipher.ssm.token, (const unsigned char *) &ssm->cipher.ssm.encrypt, 13, additional_data, 1, ssm->b_buf, ssm->c_offset, ssm->b_buf, ssm->b_buf + ssm->c_offset, CCM_TAG_LENGTH);
         ssm->cipher.ssm.encrypt.count++;
@@ -82,7 +84,6 @@ static void ssm_initial_handle(sesame * ssm, uint8_t cmd_it_code) {
 }
 
 static void ssm_parse_publish(sesame * ssm, uint8_t cmd_it_code) {
-    ESP_LOGI(TAG, "[ssm_parse_publish][%d]", cmd_it_code);
     if (cmd_it_code == SSM_ITEM_CODE_INITIAL) { // get 4 bytes random_code
         ssm_initial_handle(ssm, cmd_it_code);
     }
@@ -117,7 +118,6 @@ static void ssm_parse_response(sesame * ssm, uint8_t cmd_it_code) {
         send_read_history_cmd_to_ssm(ssm);
     }
     if (cmd_it_code == SSM_ITEM_CODE_REGISTRATION) {
-        ESP_LOGI(TAG, "[%d][ssm][registration][ok]", ssm->conn_id);
         handle_reg_data_from_ssm(ssm);
     }
 }
@@ -141,8 +141,7 @@ static void ssm_ble_receiver(sesame * ssm, const uint8_t * p_data, uint16_t len)
     uint8_t cmd_it_code = ssm->b_buf[1];
     ssm->c_offset       = ssm->c_offset - 2;
     memcpy(ssm->b_buf, ssm->b_buf + 2, ssm->c_offset);
-    // ESP_LOG_BUFFER_HEX("[ssm][say]", ssm->b_buf, ssm->c_offset);
-    ESP_LOGI(TAG, "[ssm][op:%x][it:%x]", cmd_op_code, cmd_it_code);
+    ESP_LOGI(TAG, "[ssm][say][%d][%s][%s]", ssm->conn_id,SSM_OP_CODE_STR(cmd_op_code), SSM_ITEM_CODE_STR(cmd_it_code));
     if (cmd_op_code == SSM_OP_CODE_PUBLISH) {
         ssm_parse_publish(ssm, cmd_it_code);
     }
