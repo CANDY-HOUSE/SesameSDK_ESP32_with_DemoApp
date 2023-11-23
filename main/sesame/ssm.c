@@ -115,7 +115,7 @@ static void ssm_parse_response(sesame * ssm, uint8_t cmd_it_code) {
         if (ssm->c_offset == 0) { //循環讀取 避免沒取完歷史
             return;
         }
-        ssm_readHistoryCommand(ssm);
+        send_read_history_cmd_to_ssm(ssm);
     }
     if (cmd_it_code == SSM_ITEM_CODE_REGISTRATION) {
         ESP_LOGI(TAG, "[%d][ssm][registration][ok]", ssm->conn_id);

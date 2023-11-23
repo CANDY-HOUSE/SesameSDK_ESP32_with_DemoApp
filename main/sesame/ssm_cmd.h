@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-void ssm_readHistoryCommand(sesame * ssm);
+void send_read_history_cmd_to_ssm(sesame * ssm);
 
 void ssm_unlock_all(uint8_t * tag, uint8_t tag_length);
 
