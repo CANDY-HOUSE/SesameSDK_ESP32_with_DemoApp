@@ -36,7 +36,7 @@ void handle_reg_data_from_ssm(sesame * ssm) {
     // ESP_LOG_BUFFER_HEX("deviceSecret", ssm->device_secret, 16);
     AES_CMAC(ssm->device_secret, (const unsigned char *) ssm->cipher.ssm.decrypt.random_code, 4, ssm->cipher.ssm.token);
     ssm->device_status = SSM_LOGGIN;
-    p_ssms_env->ssm_cb__(ssm);
+    p_ssms_env->ssm_cb__(ssm); // callback: ssm_action_handle() in main.c
 }
 
 void send_login_cmd_to_ssm(sesame * ssm) {
@@ -56,20 +56,15 @@ void send_read_history_cmd_to_ssm(sesame * ssm) {
     talk_to_ssm(ssm, SSM_SEG_PARSING_TYPE_CIPHERTEXT);
 }
 
-void ssm_lock_unlock(uint8_t cmd, uint8_t * tag, uint8_t tag_length) {
+void ssm_lock(uint8_t * tag, uint8_t tag_length) {
+    ESP_LOGI(TAG, "[ssm][ssm_lock][%s]", SSM_STATUS_STR(p_ssms_env->ssm.device_status));
     sesame * ssm = &p_ssms_env->ssm;
     if (ssm->device_status >= SSM_LOGGIN) {
-        if (cmd == SSM_ITEM_CODE_LOCK) {
-            ssm->b_buf[0] = cmd;
-        } else if (cmd == SSM_ITEM_CODE_UNLOCK) {
-            ssm->b_buf[0] = cmd;
-        } else {
-            return;
-        }
         if (tag_length == 0) {
             tag        = tag_esp32;
             tag_length = sizeof(tag_esp32);
         }
+        ssm->b_buf[0] = SSM_ITEM_CODE_LOCK;
         ssm->b_buf[1] = tag_length;
         ssm->c_offset = tag_length + 2;
         memcpy(ssm->b_buf + 2, tag, tag_length);

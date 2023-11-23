@@ -29,14 +29,27 @@ union ssm_cipher {
     SesameBleCipher ssm;
 };
 
+typedef struct mech_status_s {
+    uint16_t battery;
+    int16_t target;               // 馬達想到的地方
+    int16_t position;             // 感測器同步到的最新角度
+    uint8_t is_clutch_failed : 1; // 電磁鐵作棟是否成功(沒用到)
+    uint8_t is_lock_range : 1;    // 在關鎖位置
+    uint8_t is_unlock_range : 1;  // 在開鎖位置
+    uint8_t is_critical : 1;      // 開關鎖時間超時，馬達停轉
+    uint8_t is_stop : 1;          // 把手角度沒有變化
+    uint8_t is_low_battery : 1;   // 低電量(<5V)
+    uint8_t is_clockwise : 1;     // 馬達轉動方向
+} mech_status_t;                  // total 7 bytes
+
 typedef struct {
     uint8_t device_uuid[16];
     uint8_t public_key[64];
     uint8_t device_secret[16];
     uint8_t addr[6];
-    uint8_t device_status;
+    volatile uint8_t device_status;
     union ssm_cipher cipher;
-    uint8_t mech_status[7];
+    mech_status_t mech_status;
     uint16_t c_offset;
     uint8_t b_buf[80]; /// max command size is register(80 Bytes).
     uint8_t conn_id;
@@ -46,7 +59,6 @@ typedef void (*ssm_action)(sesame * ssm);
 
 struct ssm_env_tag {
     sesame ssm;
-    uint8_t number;
     ssm_action ssm_cb__;
 };
 

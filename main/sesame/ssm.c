@@ -30,10 +30,8 @@ static void ssm_parse_publish(sesame * ssm, uint8_t cmd_it_code) {
         ssm_initial_handle(ssm, cmd_it_code);
     }
     if (cmd_it_code == SSM_ITEM_CODE_MECH_STATUS) {
-        bool isInLockRange       = (ssm->b_buf[6] & 2u) > 0u;
-        bool isInUnlockRange     = (ssm->b_buf[6] & 4u) > 0u;
-        device_status lockStatus = isInLockRange ? SSM_LOCKED : isInUnlockRange ? SSM_UNLOCKED : SSM_MOVED;
-        memcpy(ssm->mech_status, ssm->b_buf, 7);
+        memcpy((void *) &(ssm->mech_status), ssm->b_buf, 7);
+        device_status_t lockStatus = ssm->mech_status.is_lock_range ? SSM_LOCKED : (ssm->mech_status.is_unlock_range ? SSM_UNLOCKED : SSM_MOVED);
         if (ssm->device_status != lockStatus) {
             ssm->device_status = lockStatus;
             p_ssms_env->ssm_cb__(ssm); // callback: ssm_action_handle
@@ -142,7 +140,6 @@ void ssm_init(ssm_action ssm_action_cb) {
         ESP_LOGE(TAG, "[ssm_init][FAIL]");
     }
     memset(p_ssms_env, 0, sizeof(struct ssm_env_tag));
-    p_ssms_env->number            = 0;
     p_ssms_env->ssm_cb__          = ssm_action_cb; // callback: ssm_action_handle
     p_ssms_env->ssm.conn_id       = 0xFF;          // 0xFF: not connected
     p_ssms_env->ssm.device_status = SSM_NOUSE;

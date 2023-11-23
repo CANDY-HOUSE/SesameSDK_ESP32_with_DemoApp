@@ -60,7 +60,7 @@ typedef enum {
     SSM_LOCKED       = 6,
     SSM_UNLOCKED     = 7,
     SSM_MOVED        = 8,
-} device_status;
+} device_status_t;
 
 typedef enum {
     SSM_OP_CODE_RESPONSE = 0x07,
