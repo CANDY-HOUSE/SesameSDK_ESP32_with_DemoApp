@@ -50,7 +50,7 @@ void send_login_cmd_to_ssm(sesame * ssm) {
 }
 
 void send_read_history_cmd_to_ssm(sesame * ssm) {
-    ESP_LOGI(TAG, "[readHistoryCommand]");
+    ESP_LOGI(TAG, "[send_read_history_cmd_to_ssm]");
     ssm->c_offset = 2;
     ssm->b_buf[0] = SSM_ITEM_CODE_HISTORY;
     ssm->b_buf[1] = 1;

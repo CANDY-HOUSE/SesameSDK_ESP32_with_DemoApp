@@ -36,7 +36,7 @@ typedef struct {
     uint8_t addr[6];
     uint8_t device_status;
     union ssm_cipher cipher;
-    uint8_t mechStatus[7];
+    uint8_t mech_status[7];
     uint16_t c_offset;
     uint8_t b_buf[80]; /// max command size is register(80 Bytes).
     uint8_t conn_id;

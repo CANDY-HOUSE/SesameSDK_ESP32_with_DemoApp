@@ -66,8 +66,7 @@ void ssm_disconnect(sesame * ssm) {
 }
 
 static void ssm_initial_handle(sesame * ssm, uint8_t cmd_it_code) {
-    // reset cipher
-    ssm->cipher.ssm.encrypt.nouse = 0;
+    ssm->cipher.ssm.encrypt.nouse = 0; // reset cipher
     ssm->cipher.ssm.decrypt.nouse = 0;
     memcpy(ssm->cipher.ssm.encrypt.random_code, ssm->b_buf, 4);
     memcpy(ssm->cipher.ssm.decrypt.random_code, ssm->b_buf, 4);
@@ -93,7 +92,7 @@ static void ssm_parse_publish(sesame * ssm, uint8_t cmd_it_code) {
         bool isInUnlockRange     = (ssm->b_buf[6] & 4u) > 0u;
         device_status lockStatus = isInLockRange ? SSM_LOCKED : isInUnlockRange ? SSM_UNLOCKED : SSM_MOVED;
         // ESP_LOGI("[ssm][mech_status]", "[%d][ssm][current lockStatus: %d][ssm->device_status: %d]", ssm->conn_id, lockStatus, ssm->device_status);
-        memcpy(ssm->mechStatus, ssm->b_buf, 7);
+        memcpy(ssm->mech_status, ssm->b_buf, 7);
         if (ssm->device_status != lockStatus) {
             ssm->device_status = lockStatus;
             p_ssms_env->ssm_cb__(ssm); // callback: ssm_action_handle
