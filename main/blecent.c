@@ -8,6 +8,7 @@
 #include "nimble/nimble_port_freertos.h"
 #include "services/gap/ble_svc_gap.h"
 
+// https://github.com/CANDY-HOUSE/Sesame_BluetoothAPI_document/blob/master/SesameOS3/1_advertising.md
 #define BLECENT_SVC_ALERT_UUID (0xFD81)
 
 struct ble_hs_adv_fields;

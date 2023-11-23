@@ -90,10 +90,10 @@ static void ssm_initial_handle(sesame * ssm, uint8_t cmd_it_code) {
     ESP_LOGI(TAG, "[ssm][null_ssm_count: %d]", null_ssm_count);
     if (null_ssm_count == SSM_MAX_NUM) { // no device_secret
         ESP_LOGI(TAG, "[ssm][no device_secret]");
-        register_sesame(ssm);
+        send_reg_cmd_to_ssm(ssm);
         return;
     }
-    login_sesame(ssm);
+    send_login_cmd_to_ssm(ssm);
 }
 
 static void ssm_parse_publish(sesame * ssm, uint8_t cmd_it_code) {
@@ -133,7 +133,7 @@ static void ssm_parse_response(sesame * ssm, uint8_t cmd_it_code) {
     }
     if (cmd_it_code == SSM_ITEM_CODE_REGISTRATION) {
         ESP_LOGI(TAG, "[%d][ssm][registration][ok]", ssm->conn_id);
-        handle_reg_ssm(ssm);
+        handle_reg_data_from_ssm(ssm);
     }
 }
 

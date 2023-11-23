@@ -5,17 +5,17 @@
 #include "uECC.h"
 #include <string.h>
 
-static const char * TAG    = "ssm_cmd.c";
-static uint8_t tag_esp32[] = { 'S', 'E', 'S', 'A', 'M', 'E', ' ', 'E', 'S', 'P', '3', '2' };
+static const char * TAG          = "ssm_cmd.c";
+static const uint8_t tag_esp32[] = { 'S', 'E', 'S', 'A', 'M', 'E', ' ', 'E', 'S', 'P', '3', '2' };
 
-uint8_t ecc_private_esp32[32];
+static uint8_t ecc_private_esp32[32];
 
 static int crypto_backend_micro_ecc_rng_callback(uint8_t * dest, unsigned size) {
     esp_fill_random(dest, (size_t) size);
     return 1;
 }
 
-void register_sesame(sesame * ssm) {
+void send_reg_cmd_to_ssm(sesame * ssm) {
     ESP_LOGI(TAG, "[ssm][register][->]");
     uECC_set_rng(crypto_backend_micro_ecc_rng_callback);
     uint8_t ecc_public_esp32[64];
@@ -26,7 +26,7 @@ void register_sesame(sesame * ssm) {
     talk_to_ssm(ssm, SSM_SEG_PARSING_TYPE_PLAINTEXT);
 }
 
-void handle_reg_ssm(sesame * ssm) {
+void handle_reg_data_from_ssm(sesame * ssm) {
     ESP_LOGI(TAG, "[ssm][register][<-]");
     memcpy(ssm->public_key, &ssm->b_buf[13], 64);
     // ESP_LOG_BUFFER_HEX("public_key", ssm->public_key, 64);
@@ -39,7 +39,7 @@ void handle_reg_ssm(sesame * ssm) {
     p_ssms_env->ssm_cb__(ssm);
 }
 
-void login_sesame(sesame * ssm) {
+void send_login_cmd_to_ssm(sesame * ssm) {
     ESP_LOGI(TAG, "[ssm][login][->]");
     ssm->b_buf[0] = SSM_ITEM_CODE_LOGIN;
     AES_CMAC(ssm->device_secret, (const unsigned char *) ssm->cipher.ssm.decrypt.tk_app_ssm, 4, ssm->cipher.ssm.ccm_key);

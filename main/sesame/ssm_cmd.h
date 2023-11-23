@@ -15,11 +15,11 @@ void ssm_lock_all(uint8_t * tag, uint8_t tag_length);
 
 void ssm_toggle_all(uint8_t * tag, uint8_t tag_length);
 
-void login_sesame(sesame * ssm);
+void send_login_cmd_to_ssm(sesame * ssm);
 
-void register_sesame(sesame * ssm);
+void send_reg_cmd_to_ssm(sesame * ssm);
 
-void handle_reg_ssm(sesame * ssm);
+void handle_reg_data_from_ssm(sesame * ssm);
 
 #ifdef __cplusplus
 }
