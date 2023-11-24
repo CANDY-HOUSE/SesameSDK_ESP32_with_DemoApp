@@ -24,25 +24,17 @@ static const char * TAG = "blecent.c";
 
 static int ssm_enable_notify(uint16_t conn_handle) {
     const struct peer_dsc * dsc;
-    uint8_t value[2];
     const struct peer * peer = peer_find(conn_handle);
 
     dsc = peer_dsc_find_uuid(peer, BLE_UUID16_DECLARE(BLECENT_SVC_ALERT_UUID), sesame_ntf_uuid, BLE_UUID16_DECLARE(BLE_GATT_DSC_CLT_CFG_UUID16));
     if (dsc == NULL) {
-        ESP_LOGE(TAG,
-                 "Error: Peer lacks a CCCD for the Unread Alert "
-                 "Status characteristic\n");
+        ESP_LOGE(TAG, "Error: Peer lacks a CCCD for the Unread Alert Status characteristic\n");
         goto err;
     }
-    // ESP_LOGI(TAG, "[conn_handle:%d][notify_handle:%d]", conn_handle, dsc->dsc.handle);
-    value[0] = 1;
-    value[1] = 0;
+    uint8_t value[2] = { 0x01, 0x00 };
     int rc = ble_gattc_write_flat(conn_handle, dsc->dsc.handle, value, sizeof value, NULL, NULL);
     if (rc != 0) {
-        ESP_LOGE(TAG,
-                 "Error: Failed to subscribe to characteristic; "
-                 "rc=%d\n",
-                 rc);
+        ESP_LOGE(TAG, "Error: Failed to subscribe to characteristic; rc=%d\n", rc);
         goto err;
     }
     ESP_LOGW(TAG, "Enable notify success!!");
@@ -51,19 +43,13 @@ err:
     return ble_gap_terminate(peer->conn_handle, BLE_ERR_REM_USER_CONN_TERM); /* Terminate the connection. */
 }
 
-static void blecent_on_service_disc_complete(const struct peer * peer, int status, void * arg) {
+static void service_disc_complete(const struct peer * peer, int status, void * arg) {
     if (status != 0) {
-        ESP_LOGE(TAG,
-                 "Error: Service discovery failed; status=%d "
-                 "conn_handle=%d\n",
-                 status, peer->conn_handle);
+        ESP_LOGE(TAG, "Error: Service discovery failed; status=%d conn_handle=%d\n", status, peer->conn_handle);
         ble_gap_terminate(peer->conn_handle, BLE_ERR_REM_USER_CONN_TERM);
         return;
     }
-    ESP_LOGI(TAG,
-             "Service discovery complete; status=%d "
-             "conn_handle=%d\n",
-             status, peer->conn_handle);
+    ESP_LOGI(TAG, "Service discovery complete conn_handle=%d\n", peer->conn_handle);
     ssm_enable_notify(peer->conn_handle);
 }
 
@@ -83,7 +69,7 @@ static int ble_gap_event_connect_handle(struct ble_gap_event * event, struct ble
     p_ssms_env->ssm.device_status = SSM_CONNECTED;        // set the device status
     p_ssms_env->ssm.conn_id = event->connect.conn_handle; // save the connection handle
     ESP_LOGW(TAG, "Connect SSM success handle=%d", event->connect.conn_handle);
-    rc = peer_disc_all(event->connect.conn_handle, blecent_on_service_disc_complete, NULL);
+    rc = peer_disc_all(event->connect.conn_handle, service_disc_complete, NULL);
     if (rc != 0) {
         ESP_LOGE(TAG, "Failed to discover services; rc=%d\n", rc);
         return ESP_FAIL;
