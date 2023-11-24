@@ -17,7 +17,6 @@ static const ble_uuid_t * ssm_ntf_uuid = BLE_UUID128_DECLARE(0x3e, 0x99, 0x76, 0
 static int ssm_enable_notify(uint16_t conn_handle) {
     const struct peer_dsc * dsc;
     const struct peer * peer = peer_find(conn_handle);
-
     dsc = peer_dsc_find_uuid(peer, ssm_svc_uuid, ssm_ntf_uuid, BLE_UUID16_DECLARE(BLE_GATT_DSC_CLT_CFG_UUID16));
     if (dsc == NULL) {
         ESP_LOGE(TAG, "Error: Peer lacks a CCCD for the Unread Alert Status characteristic\n");
@@ -45,14 +44,15 @@ static void service_disc_complete(const struct peer * peer, int status, void * a
     ssm_enable_notify(peer->conn_handle);
 }
 
-static int ble_gap_event_connect_handle(struct ble_gap_event * event, struct ble_gap_conn_desc * desc) {
+static int ble_gap_event_connect_handle(struct ble_gap_event * event) {
     if (event->connect.status != 0) {
         ESP_LOGE(TAG, "Error: Connection failed; status=%d\n", event->connect.status);
         return ESP_FAIL;
     }
-    int rc = ble_gap_conn_find(event->connect.conn_handle, desc);
+    static struct ble_gap_conn_desc desc;
+    int rc = ble_gap_conn_find(event->connect.conn_handle, &desc);
     assert(rc == 0);
-    print_conn_desc(desc);
+    print_conn_desc(&desc);
     rc = peer_add(event->connect.conn_handle);
     if (rc != 0) {
         ESP_LOGE(TAG, "Failed to add peer; rc=%d\n", rc);
@@ -71,12 +71,9 @@ static int ble_gap_event_connect_handle(struct ble_gap_event * event, struct ble
 
 static int ble_gap_connect_event(struct ble_gap_event * event, void * arg) {
     // ESP_LOGI(TAG, "[ble_gap_connect_event: %d]", event->type);
-    int rc; // return code
-    static struct ble_gap_conn_desc desc;
-
     switch (event->type) {
     case BLE_GAP_EVENT_CONNECT:
-        return ble_gap_event_connect_handle(event, &desc);
+        return ble_gap_event_connect_handle(event);
 
     case BLE_GAP_EVENT_DISCONNECT:
         ESP_LOGW(TAG, "disconnect; reason=%d ", event->disconnect.reason);
@@ -94,17 +91,6 @@ static int ble_gap_connect_event(struct ble_gap_event * event, void * arg) {
     case BLE_GAP_EVENT_NOTIFY_RX:
         ssm_ble_receiver(&p_ssms_env->ssm, event->notify_rx.om->om_data, event->notify_rx.om->om_len);
         return ESP_OK;
-
-    case BLE_GAP_EVENT_MTU:
-        ESP_LOGI(TAG, "mtu update event; conn_handle=%d cid=%d mtu=%d\n", event->mtu.conn_handle, event->mtu.channel_id, event->mtu.value);
-        return ESP_OK;
-
-    case BLE_GAP_EVENT_REPEAT_PAIRING:
-        ESP_LOGI(TAG, "BLE_GAP_EVENT_REPEAT_PAIRING");
-        rc = ble_gap_conn_find(event->repeat_pairing.conn_handle, &desc);
-        assert(rc == 0);
-        ble_store_util_delete_peer(&desc.peer_id_addr);
-        return BLE_GAP_REPEAT_PAIRING_RETRY;
 
     default:
         return ESP_OK;
