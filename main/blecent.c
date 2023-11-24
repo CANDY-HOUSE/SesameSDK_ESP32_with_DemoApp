@@ -22,7 +22,7 @@ static const ble_uuid_t * sesame_ntf_uuid = BLE_UUID128_DECLARE(0x3e, 0x99, 0x76
 
 static const char * TAG = "blecent.c";
 
-static int blecent_on_write(uint16_t conn_handle) {
+static int ssm_enable_notify(uint16_t conn_handle) {
     const struct peer_dsc * dsc;
     uint8_t value[2];
     const struct peer * peer = peer_find(conn_handle);
@@ -64,10 +64,10 @@ static void blecent_on_service_disc_complete(const struct peer * peer, int statu
              "Service discovery complete; status=%d "
              "conn_handle=%d\n",
              status, peer->conn_handle);
-    blecent_on_write(peer->conn_handle);
+    ssm_enable_notify(peer->conn_handle);
 }
 
-static int ble_gap_event_connect_handle(struct ble_gap_event * event, void * arg, struct ble_gap_conn_desc * desc) {
+static int ble_gap_event_connect_handle(struct ble_gap_event * event, struct ble_gap_conn_desc * desc) {
     if (event->connect.status != 0) {
         ESP_LOGE(TAG, "Error: Connection failed; status=%d\n", event->connect.status);
         return ESP_FAIL;
@@ -98,7 +98,7 @@ static int ble_gap_connect_event(struct ble_gap_event * event, void * arg) {
 
     switch (event->type) {
     case BLE_GAP_EVENT_CONNECT:
-        return ble_gap_event_connect_handle(event, arg, &desc);
+        return ble_gap_event_connect_handle(event, &desc);
 
     case BLE_GAP_EVENT_DISCONNECT:
         ESP_LOGW(TAG, "disconnect; reason=%d ", event->disconnect.reason);
