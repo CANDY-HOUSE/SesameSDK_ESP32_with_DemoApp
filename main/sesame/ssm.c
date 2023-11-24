@@ -26,36 +26,44 @@ static void ssm_initial_handle(sesame * ssm, uint8_t cmd_it_code) {
 }
 
 static void ssm_parse_publish(sesame * ssm, uint8_t cmd_it_code) {
-    if (cmd_it_code == SSM_ITEM_CODE_INITIAL) { // get 4 bytes random_code
+    switch (cmd_it_code) {
+    case SSM_ITEM_CODE_INITIAL: // get 4 bytes random_code
         ssm_initial_handle(ssm, cmd_it_code);
-    }
-    if (cmd_it_code == SSM_ITEM_CODE_MECH_STATUS) {
+        break;
+    case SSM_ITEM_CODE_MECH_STATUS:
         memcpy((void *) &(ssm->mech_status), ssm->b_buf, 7);
         device_status_t lockStatus = ssm->mech_status.is_lock_range ? SSM_LOCKED : (ssm->mech_status.is_unlock_range ? SSM_UNLOCKED : SSM_MOVED);
         if (ssm->device_status != lockStatus) {
             ssm->device_status = lockStatus;
             p_ssms_env->ssm_cb__(ssm); // callback: ssm_action_handle
         }
+        break;
+    default:
+        break;
     }
 }
 
 static void ssm_parse_response(sesame * ssm, uint8_t cmd_it_code) {
     ssm->c_offset = ssm->c_offset - 1;
     memcpy(ssm->b_buf, ssm->b_buf + 1, ssm->c_offset);
-    if (cmd_it_code == SSM_ITEM_CODE_REGISTRATION) {
+    switch (cmd_it_code) {
+    case SSM_ITEM_CODE_REGISTRATION:
         handle_reg_data_from_ssm(ssm);
-    }
-    if (cmd_it_code == SSM_ITEM_CODE_LOGIN) {
+        break;
+    case SSM_ITEM_CODE_LOGIN:
         ESP_LOGI(TAG, "[%d][ssm][login][ok]", ssm->conn_id);
         ssm->device_status = SSM_LOGGIN;
         p_ssms_env->ssm_cb__(ssm); // callback: ssm_action_handle
-    }
-    if (cmd_it_code == SSM_ITEM_CODE_HISTORY) {
+        break;
+    case SSM_ITEM_CODE_HISTORY:
         ESP_LOGI(TAG, "[%d][ssm][hisdataLength: %d]", ssm->conn_id, ssm->c_offset);
         if (ssm->c_offset == 0) { //循環讀取 避免沒取完歷史
             return;
         }
         send_read_history_cmd_to_ssm(ssm);
+        break;
+    default:
+        break;
     }
 }
 
