@@ -91,8 +91,6 @@ void ssm_ble_receiver(sesame * ssm, const uint8_t * p_data, uint16_t len) {
 
 void talk_to_ssm(sesame * ssm, uint8_t parsing_type) {
     ESP_LOGI(TAG, "[esp32][say][%d][%s]", ssm->conn_id, SSM_ITEM_CODE_STR(ssm->b_buf[0]));
-    // ESP_LOGI(TAG, "[talk_to_ssm][conn_id:%d][len:%d]", ssm->conn_id, ssm->c_offset);
-    // ESP_LOG_BUFFER_HEX_LEVEL("[esp32][say]", ssm->b_buf, ssm->c_offset, ESP_LOG_INFO);
     if (parsing_type == SSM_SEG_PARSING_TYPE_CIPHERTEXT) {
         aes_ccm_encrypt_and_tag(ssm->cipher.ssm.token, (const unsigned char *) &ssm->cipher.ssm.encrypt, 13, additional_data, 1, ssm->b_buf, ssm->c_offset, ssm->b_buf, ssm->b_buf + ssm->c_offset, CCM_TAG_LENGTH);
         ssm->cipher.ssm.encrypt.count++;
@@ -126,7 +124,7 @@ void talk_to_ssm(sesame * ssm, uint8_t parsing_type) {
 void ssm_disconnect(sesame * ssm) {
     ESP_LOGW(TAG, "[ssm][disconnect]");
     if (ssm->device_status >= SSM_CONNECTED) {
-        ble_gap_terminate(ssm->conn_id, BLE_ERR_REM_USER_CONN_TERM); // disconnect
+        ble_gap_terminate(ssm->conn_id, BLE_ERR_REM_USER_CONN_TERM);
     }
 }
 

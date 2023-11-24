@@ -60,7 +60,7 @@ static int ble_gap_event_connect_handle(struct ble_gap_event * event) {
     }
     p_ssms_env->ssm.device_status = SSM_CONNECTED;        // set the device status
     p_ssms_env->ssm.conn_id = event->connect.conn_handle; // save the connection handle
-    ESP_LOGW(TAG, "Connect SSM success handle=%d", event->connect.conn_handle);
+    ESP_LOGW(TAG, "Connect SSM success handle=%d", p_ssms_env->ssm.conn_id);
     rc = peer_disc_all(event->connect.conn_handle, service_disc_complete, NULL);
     if (rc != 0) {
         ESP_LOGE(TAG, "Failed to discover services; rc=%d\n", rc);
