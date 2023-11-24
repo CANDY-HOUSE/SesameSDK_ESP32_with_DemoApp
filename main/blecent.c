@@ -93,7 +93,7 @@ static int ble_gap_connect_event(struct ble_gap_event * event, void * arg) {
         print_conn_desc(&event->disconnect.conn);
         peer_delete(event->disconnect.conn.conn_handle);
         reconnect_ssm();
-        return ESP_OK; // reconnect
+        return ESP_OK;
 
     case BLE_GAP_EVENT_CONN_UPDATE_REQ:
         ESP_LOGI(TAG, "connection update request event; conn_handle=%d itvl_min=%d itvl_max=%d latency=%d supervision_timoeut=%d min_ce_len=%d max_ce_len=%d\n", event->conn_update_req.conn_handle, event->conn_update_req.peer_params->itvl_min,
