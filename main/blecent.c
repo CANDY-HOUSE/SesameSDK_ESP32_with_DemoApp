@@ -99,8 +99,7 @@ static int ble_gap_connect_event(struct ble_gap_event * event, void * arg) {
 
 static void ssm_scan_connect(const struct ble_hs_adv_fields * fields, void * disc) {
     ble_addr_t * addr = &((struct ble_gap_disc_desc *) disc)->addr;
-    int8_t rssi = ((struct ble_gap_disc_desc *) disc)->rssi;
-    if (rssi < -60) { // RSSI threshold
+    if (((struct ble_gap_disc_desc *) disc)->rssi < -60) { // RSSI threshold
         return;
     }
     if (fields->mfg_data[0] == 0x5A && fields->mfg_data[1] == 0x05) { // is SSM
@@ -118,8 +117,7 @@ static void ssm_scan_connect(const struct ble_hs_adv_fields * fields, void * dis
     } else {
         return; // not SSM
     }
-    ble_gap_disc_cancel(); /* Scanning must be stopped before a connection can be nitiated. */
-    addr = &((struct ble_gap_disc_desc *) disc)->addr;
+    ble_gap_disc_cancel(); // stop scan
     ESP_LOGW(TAG, "Connect SSM addr=%s addrType=%d", addr_str(addr->val), addr->type);
     int rc = ble_gap_connect(BLE_OWN_ADDR_PUBLIC, addr, 10000, NULL, ble_gap_connect_event, NULL);
     if (rc != 0) {
