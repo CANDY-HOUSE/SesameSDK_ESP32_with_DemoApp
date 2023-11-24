@@ -159,10 +159,8 @@ static void blecent_host_task(void * param) {
 }
 
 void esp_ble_gatt_write(sesame * ssm, uint8_t * value, uint16_t length) {
-    const struct peer_chr * chr;
-    const struct peer * peer;
-    peer = peer_find(ssm->conn_id);
-    chr = peer_chr_find_uuid(peer, ssm_svc_uuid, ssm_chr_uuid);
+    const struct peer * peer = peer_find(ssm->conn_id);
+    const struct peer_chr * chr = peer_chr_find_uuid(peer, ssm_svc_uuid, ssm_chr_uuid);
     if (chr == NULL) {
         ESP_LOGE(TAG, "Error: Peer doesn't have the subscribable characteristic\n");
         return;
