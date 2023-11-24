@@ -8,19 +8,17 @@
 #include "nimble/nimble_port_freertos.h"
 #include "services/gap/ble_svc_gap.h"
 
-#define BLECENT_SVC_ALERT_UUID (0xFD81) // https://github.com/CANDY-HOUSE/Sesame_BluetoothAPI_document/blob/master/SesameOS3/1_advertising.md
+static const char * TAG = "blecent.c";
 
-static const ble_uuid_t * ssm_svc_uuid = BLE_UUID16_DECLARE(BLECENT_SVC_ALERT_UUID);
+static const ble_uuid_t * ssm_svc_uuid = BLE_UUID16_DECLARE(0xFD81); // https://github.com/CANDY-HOUSE/Sesame_BluetoothAPI_document/blob/master/SesameOS3/1_advertising.md
 static const ble_uuid_t * ssm_chr_uuid = BLE_UUID128_DECLARE(0x3e, 0x99, 0x76, 0xc6, 0xb4, 0xdb, 0xd3, 0xb6, 0x56, 0x98, 0xae, 0xa5, 0x02, 0x00, 0x86, 0x16);
 static const ble_uuid_t * ssm_ntf_uuid = BLE_UUID128_DECLARE(0x3e, 0x99, 0x76, 0xc6, 0xb4, 0xdb, 0xd3, 0xb6, 0x56, 0x98, 0xae, 0xa5, 0x03, 0x00, 0x86, 0x16);
-
-static const char * TAG = "blecent.c";
 
 static int ssm_enable_notify(uint16_t conn_handle) {
     const struct peer_dsc * dsc;
     const struct peer * peer = peer_find(conn_handle);
 
-    dsc = peer_dsc_find_uuid(peer, BLE_UUID16_DECLARE(BLECENT_SVC_ALERT_UUID), ssm_ntf_uuid, BLE_UUID16_DECLARE(BLE_GATT_DSC_CLT_CFG_UUID16));
+    dsc = peer_dsc_find_uuid(peer, ssm_svc_uuid, ssm_ntf_uuid, BLE_UUID16_DECLARE(BLE_GATT_DSC_CLT_CFG_UUID16));
     if (dsc == NULL) {
         ESP_LOGE(TAG, "Error: Peer lacks a CCCD for the Unread Alert Status characteristic\n");
         goto err;
