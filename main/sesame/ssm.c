@@ -121,13 +121,6 @@ void talk_to_ssm(sesame * ssm, uint8_t parsing_type) {
     }
 }
 
-void ssm_disconnect(sesame * ssm) {
-    ESP_LOGW(TAG, "[ssm][disconnect]");
-    if (ssm->device_status >= SSM_CONNECTED) {
-        ble_gap_terminate(ssm->conn_id, BLE_ERR_REM_USER_CONN_TERM);
-    }
-}
-
 void ssm_mem_deinit(void) {
     free(p_ssms_env);
 }

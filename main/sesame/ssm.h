@@ -70,8 +70,6 @@ void ssm_ble_receiver(sesame * ssm, const uint8_t * p_data, uint16_t len);
 
 void talk_to_ssm(sesame * ssm, uint8_t parsing_type);
 
-void ssm_disconnect(sesame * ssm);
-
 void ssm_mem_deinit(void);
 
 void ssm_init(ssm_action ssm_action_cb);
