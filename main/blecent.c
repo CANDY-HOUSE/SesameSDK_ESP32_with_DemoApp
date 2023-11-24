@@ -14,6 +14,8 @@ static const ble_uuid_t * ssm_svc_uuid = BLE_UUID16_DECLARE(0xFD81); // https://
 static const ble_uuid_t * ssm_chr_uuid = BLE_UUID128_DECLARE(0x3e, 0x99, 0x76, 0xc6, 0xb4, 0xdb, 0xd3, 0xb6, 0x56, 0x98, 0xae, 0xa5, 0x02, 0x00, 0x86, 0x16);
 static const ble_uuid_t * ssm_ntf_uuid = BLE_UUID128_DECLARE(0x3e, 0x99, 0x76, 0xc6, 0xb4, 0xdb, 0xd3, 0xb6, 0x56, 0x98, 0xae, 0xa5, 0x03, 0x00, 0x86, 0x16);
 
+static int ble_gap_connect_event(struct ble_gap_event * event, void * arg);
+
 static int ssm_enable_notify(uint16_t conn_handle) {
     const struct peer_dsc * dsc;
     const struct peer * peer = peer_find(conn_handle);
@@ -69,6 +71,17 @@ static int ble_gap_event_connect_handle(struct ble_gap_event * event) {
     return ESP_OK;
 }
 
+static void reconnect_ssm(void) {
+    ble_addr_t addr;
+    addr.type = BLE_ADDR_RANDOM;
+    memcpy(addr.val, p_ssms_env->ssm.addr, 6);
+    int rc = ble_gap_connect(BLE_OWN_ADDR_PUBLIC, &addr, 30000, NULL, ble_gap_connect_event, NULL);
+    if (rc != 0) {
+        ESP_LOGE(TAG, "Error: Failed to connect to device; rc=%d\n", rc);
+        return;
+    }
+}
+
 static int ble_gap_connect_event(struct ble_gap_event * event, void * arg) {
     // ESP_LOGI(TAG, "[ble_gap_connect_event: %d]", event->type);
     switch (event->type) {
@@ -79,6 +92,7 @@ static int ble_gap_connect_event(struct ble_gap_event * event, void * arg) {
         ESP_LOGW(TAG, "disconnect; reason=%d ", event->disconnect.reason);
         print_conn_desc(&event->disconnect.conn);
         peer_delete(event->disconnect.conn.conn_handle);
+        reconnect_ssm();
         return ESP_OK; // reconnect
 
     case BLE_GAP_EVENT_CONN_UPDATE_REQ:
@@ -119,7 +133,7 @@ static void ssm_scan_connect(const struct ble_hs_adv_fields * fields, void * dis
     }
     ble_gap_disc_cancel(); // stop scan
     ESP_LOGW(TAG, "Connect SSM addr=%s addrType=%d", addr_str(addr->val), addr->type);
-    int rc = ble_gap_connect(BLE_OWN_ADDR_PUBLIC, addr, 10000, NULL, ble_gap_connect_event, NULL);
+    int rc = ble_gap_connect(BLE_OWN_ADDR_PUBLIC, addr, 30000, NULL, ble_gap_connect_event, NULL);
     if (rc != 0) {
         ESP_LOGE(TAG, "Error: Failed to connect to device; rc=%d\n", rc);
         return;
