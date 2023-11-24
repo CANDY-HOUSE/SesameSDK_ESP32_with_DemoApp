@@ -10,15 +10,9 @@
 
 #define BLECENT_SVC_ALERT_UUID (0xFD81) // https://github.com/CANDY-HOUSE/Sesame_BluetoothAPI_document/blob/master/SesameOS3/1_advertising.md
 
-struct ble_hs_adv_fields;
-struct ble_gap_conn_desc;
-struct ble_hs_cfg;
-union ble_store_value;
-union ble_store_key;
-
-static const ble_uuid_t * sesame_svc_uuid = BLE_UUID16_DECLARE(BLECENT_SVC_ALERT_UUID);
-static const ble_uuid_t * sesame_chr_uuid = BLE_UUID128_DECLARE(0x3e, 0x99, 0x76, 0xc6, 0xb4, 0xdb, 0xd3, 0xb6, 0x56, 0x98, 0xae, 0xa5, 0x02, 0x00, 0x86, 0x16);
-static const ble_uuid_t * sesame_ntf_uuid = BLE_UUID128_DECLARE(0x3e, 0x99, 0x76, 0xc6, 0xb4, 0xdb, 0xd3, 0xb6, 0x56, 0x98, 0xae, 0xa5, 0x03, 0x00, 0x86, 0x16);
+static const ble_uuid_t * ssm_svc_uuid = BLE_UUID16_DECLARE(BLECENT_SVC_ALERT_UUID);
+static const ble_uuid_t * ssm_chr_uuid = BLE_UUID128_DECLARE(0x3e, 0x99, 0x76, 0xc6, 0xb4, 0xdb, 0xd3, 0xb6, 0x56, 0x98, 0xae, 0xa5, 0x02, 0x00, 0x86, 0x16);
+static const ble_uuid_t * ssm_ntf_uuid = BLE_UUID128_DECLARE(0x3e, 0x99, 0x76, 0xc6, 0xb4, 0xdb, 0xd3, 0xb6, 0x56, 0x98, 0xae, 0xa5, 0x03, 0x00, 0x86, 0x16);
 
 static const char * TAG = "blecent.c";
 
@@ -26,7 +20,7 @@ static int ssm_enable_notify(uint16_t conn_handle) {
     const struct peer_dsc * dsc;
     const struct peer * peer = peer_find(conn_handle);
 
-    dsc = peer_dsc_find_uuid(peer, BLE_UUID16_DECLARE(BLECENT_SVC_ALERT_UUID), sesame_ntf_uuid, BLE_UUID16_DECLARE(BLE_GATT_DSC_CLT_CFG_UUID16));
+    dsc = peer_dsc_find_uuid(peer, BLE_UUID16_DECLARE(BLECENT_SVC_ALERT_UUID), ssm_ntf_uuid, BLE_UUID16_DECLARE(BLE_GATT_DSC_CLT_CFG_UUID16));
     if (dsc == NULL) {
         ESP_LOGE(TAG, "Error: Peer lacks a CCCD for the Unread Alert Status characteristic\n");
         goto err;
@@ -79,8 +73,8 @@ static int ble_gap_event_connect_handle(struct ble_gap_event * event, struct ble
 
 static int ble_gap_connect_event(struct ble_gap_event * event, void * arg) {
     // ESP_LOGI(TAG, "[ble_gap_connect_event: %d]", event->type);
-    static struct ble_gap_conn_desc desc;
     int rc; // return code
+    static struct ble_gap_conn_desc desc;
 
     switch (event->type) {
     case BLE_GAP_EVENT_CONNECT:
@@ -187,17 +181,14 @@ void esp_ble_gatt_write(sesame * ssm, uint8_t * value, uint16_t length) {
     const struct peer_chr * chr;
     const struct peer * peer;
     peer = peer_find(ssm->conn_id);
-    chr = peer_chr_find_uuid(peer, sesame_svc_uuid, sesame_chr_uuid);
+    chr = peer_chr_find_uuid(peer, ssm_svc_uuid, ssm_chr_uuid);
     if (chr == NULL) {
         ESP_LOGE(TAG, "Error: Peer doesn't have the subscribable characteristic\n");
         return;
     }
     int rc = ble_gattc_write_flat(ssm->conn_id, chr->chr.val_handle, value, length, NULL, NULL);
     if (rc != 0) {
-        ESP_LOGE(TAG,
-                 "Error: Failed to write to the subscribable characteristic; "
-                 "rc=%d\n",
-                 rc);
+        ESP_LOGE(TAG, "Error: Failed to write to the subscribable characteristic; rc=%d\n", rc);
     }
 }
 
