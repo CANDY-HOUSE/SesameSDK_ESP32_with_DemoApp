@@ -13,6 +13,7 @@ static void ssm_action_handle(sesame * ssm) {
 
 void app_main(void) {
     ESP_LOGI(TAG, "SesameSDK_ESP32 [11/24][087]");
+    nvs_flash_init();
     ssm_init(ssm_action_handle);
     esp_ble_init();
 }
