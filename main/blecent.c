@@ -79,7 +79,7 @@ static int ble_gap_connect_event(struct ble_gap_event * event, void * arg) {
         ESP_LOGW(TAG, "disconnect; reason=%d ", event->disconnect.reason);
         print_conn_desc(&event->disconnect.conn);
         peer_delete(event->disconnect.conn.conn_handle);
-        return ESP_OK;
+        return ESP_OK; // reconnect
 
     case BLE_GAP_EVENT_CONN_UPDATE_REQ:
         ESP_LOGI(TAG, "connection update request event; conn_handle=%d itvl_min=%d itvl_max=%d latency=%d supervision_timoeut=%d min_ce_len=%d max_ce_len=%d\n", event->conn_update_req.conn_handle, event->conn_update_req.peer_params->itvl_min,
@@ -126,7 +126,7 @@ static void ssm_scan_connect(const struct ble_hs_adv_fields * fields, void * dis
     }
 }
 
-static int ble_adv_scan_event(struct ble_gap_event * event, void * arg) {
+static int ble_gap_disc_event(struct ble_gap_event * event, void * arg) {
     // ESP_LOG_BUFFER_HEX_LEVEL("[find_device_mac]", event->disc.addr.val, 6, ESP_LOG_WARN);
     struct ble_hs_adv_fields fields;
     int rc = ble_hs_adv_parse_fields(&fields, event->disc.data, event->disc.length_data);
@@ -146,7 +146,7 @@ static void blecent_scan(void) {
     disc_params.window = 0;
     disc_params.filter_policy = 0;
     disc_params.limited = 0;
-    int rc = ble_gap_disc(BLE_OWN_ADDR_PUBLIC, BLE_HS_FOREVER, &disc_params, ble_adv_scan_event, NULL);
+    int rc = ble_gap_disc(BLE_OWN_ADDR_PUBLIC, BLE_HS_FOREVER, &disc_params, ble_gap_disc_event, NULL);
     if (rc != 0) {
         ESP_LOGE(TAG, "Error initiating GAP discovery procedure; rc=0x%x\n", rc);
     }

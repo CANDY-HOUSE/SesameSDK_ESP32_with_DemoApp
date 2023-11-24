@@ -10,12 +10,12 @@ static uint8_t additional_data[] = { 0x00 };
 struct ssm_env_tag * p_ssms_env = NULL;
 
 static void ssm_initial_handle(sesame * ssm, uint8_t cmd_it_code) {
-    ssm->cipher.ssm.encrypt.nouse = 0; // reset cipher
-    ssm->cipher.ssm.decrypt.nouse = 0;
-    memcpy(ssm->cipher.ssm.encrypt.random_code, ssm->b_buf, 4);
-    memcpy(ssm->cipher.ssm.decrypt.random_code, ssm->b_buf, 4);
-    ssm->cipher.ssm.encrypt.count = 0;
-    ssm->cipher.ssm.decrypt.count = 0;
+    ssm->cipher.encrypt.nouse = 0; // reset cipher
+    ssm->cipher.decrypt.nouse = 0;
+    memcpy(ssm->cipher.encrypt.random_code, ssm->b_buf, 4);
+    memcpy(ssm->cipher.decrypt.random_code, ssm->b_buf, 4);
+    ssm->cipher.encrypt.count = 0;
+    ssm->cipher.decrypt.count = 0;
 
     if (p_ssms_env->ssm.device_secret[0] == 0) {
         ESP_LOGI(TAG, "[ssm][no device_secret]");
@@ -70,8 +70,8 @@ void ssm_ble_receiver(sesame * ssm, const uint8_t * p_data, uint16_t len) {
     }
     if (p_data[0] >> 1u == SSM_SEG_PARSING_TYPE_CIPHERTEXT) {
         ssm->c_offset = ssm->c_offset - CCM_TAG_LENGTH;
-        aes_ccm_auth_decrypt(ssm->cipher.ssm.token, (const unsigned char *) &ssm->cipher.ssm.decrypt, 13, additional_data, 1, ssm->b_buf, ssm->c_offset, ssm->b_buf, ssm->b_buf + ssm->c_offset, CCM_TAG_LENGTH);
-        ssm->cipher.ssm.decrypt.count++;
+        aes_ccm_auth_decrypt(ssm->cipher.token, (const unsigned char *) &ssm->cipher.decrypt, 13, additional_data, 1, ssm->b_buf, ssm->c_offset, ssm->b_buf, ssm->b_buf + ssm->c_offset, CCM_TAG_LENGTH);
+        ssm->cipher.decrypt.count++;
     }
 
     uint8_t cmd_op_code = ssm->b_buf[0];
@@ -81,8 +81,7 @@ void ssm_ble_receiver(sesame * ssm, const uint8_t * p_data, uint16_t len) {
     ESP_LOGI(TAG, "[ssm][say][%d][%s][%s]", ssm->conn_id, SSM_OP_CODE_STR(cmd_op_code), SSM_ITEM_CODE_STR(cmd_it_code));
     if (cmd_op_code == SSM_OP_CODE_PUBLISH) {
         ssm_parse_publish(ssm, cmd_it_code);
-    }
-    if (cmd_op_code == SSM_OP_CODE_RESPONSE) {
+    } else if (cmd_op_code == SSM_OP_CODE_RESPONSE) {
         ssm_parse_response(ssm, cmd_it_code);
     }
     ssm->c_offset = 0;
@@ -91,8 +90,8 @@ void ssm_ble_receiver(sesame * ssm, const uint8_t * p_data, uint16_t len) {
 void talk_to_ssm(sesame * ssm, uint8_t parsing_type) {
     ESP_LOGI(TAG, "[esp32][say][%d][%s]", ssm->conn_id, SSM_ITEM_CODE_STR(ssm->b_buf[0]));
     if (parsing_type == SSM_SEG_PARSING_TYPE_CIPHERTEXT) {
-        aes_ccm_encrypt_and_tag(ssm->cipher.ssm.token, (const unsigned char *) &ssm->cipher.ssm.encrypt, 13, additional_data, 1, ssm->b_buf, ssm->c_offset, ssm->b_buf, ssm->b_buf + ssm->c_offset, CCM_TAG_LENGTH);
-        ssm->cipher.ssm.encrypt.count++;
+        aes_ccm_encrypt_and_tag(ssm->cipher.token, (const unsigned char *) &ssm->cipher.encrypt, 13, additional_data, 1, ssm->b_buf, ssm->c_offset, ssm->b_buf, ssm->b_buf + ssm->c_offset, CCM_TAG_LENGTH);
+        ssm->cipher.encrypt.count++;
         ssm->c_offset = ssm->c_offset + CCM_TAG_LENGTH;
     }
 
