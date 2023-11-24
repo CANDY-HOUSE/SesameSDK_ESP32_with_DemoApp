@@ -57,7 +57,7 @@ void send_read_history_cmd_to_ssm(sesame * ssm) {
 }
 
 void ssm_lock(uint8_t * tag, uint8_t tag_length) {
-    ESP_LOGI(TAG, "[ssm][ssm_lock][%s]", SSM_STATUS_STR(p_ssms_env->ssm.device_status));
+    // ESP_LOGI(TAG, "[ssm][ssm_lock][%s]", SSM_STATUS_STR(p_ssms_env->ssm.device_status));
     sesame * ssm = &p_ssms_env->ssm;
     if (ssm->device_status >= SSM_LOGGIN) {
         if (tag_length == 0) {

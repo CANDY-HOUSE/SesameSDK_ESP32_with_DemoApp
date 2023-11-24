@@ -93,13 +93,9 @@ static int ble_gap_connect_event(struct ble_gap_event * event, void * arg) {
         return ESP_OK;
 
     case BLE_GAP_EVENT_CONN_UPDATE_REQ:
-        ESP_LOGI(TAG,
-                 "connection update request event; "
-                 "conn_handle=%d itvl_min=%d itvl_max=%d "
-                 "latency=%d supervision_timoeut=%d "
-                 "min_ce_len=%d max_ce_len=%d\n",
-                 event->conn_update_req.conn_handle, event->conn_update_req.peer_params->itvl_min, event->conn_update_req.peer_params->itvl_max, event->conn_update_req.peer_params->latency, event->conn_update_req.peer_params->supervision_timeout,
-                 event->conn_update_req.peer_params->min_ce_len, event->conn_update_req.peer_params->max_ce_len);
+        ESP_LOGI(TAG, "connection update request event; conn_handle=%d itvl_min=%d itvl_max=%d latency=%d supervision_timoeut=%d min_ce_len=%d max_ce_len=%d\n", event->conn_update_req.conn_handle, event->conn_update_req.peer_params->itvl_min,
+                 event->conn_update_req.peer_params->itvl_max, event->conn_update_req.peer_params->latency, event->conn_update_req.peer_params->supervision_timeout, event->conn_update_req.peer_params->min_ce_len,
+                 event->conn_update_req.peer_params->max_ce_len);
         *event->conn_update_req.self_params = *event->conn_update_req.peer_params;
         return ESP_OK;
 
