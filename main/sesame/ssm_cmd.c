@@ -32,7 +32,7 @@ void handle_reg_data_from_ssm(sesame * ssm) {
     memcpy(ssm->public_key, &ssm->b_buf[13], 64);
     uint8_t ecdh_secret_ssm[32];
     uECC_shared_secret_lit(ssm->public_key, ecc_private_esp32, ecdh_secret_ssm, uECC_secp256r1());
-    memcpy(ssm->device_secret, ecdh_secret_ssm, 16); // ssm device_secret
+    memcpy(ssm->device_secret, ecdh_secret_ssm, 16);
     // ESP_LOG_BUFFER_HEX("deviceSecret", ssm->device_secret, 16);
     AES_CMAC(ssm->device_secret, (const unsigned char *) ssm->cipher.ssm.decrypt.random_code, 4, ssm->cipher.ssm.token);
     ssm->device_status = SSM_LOGGIN;

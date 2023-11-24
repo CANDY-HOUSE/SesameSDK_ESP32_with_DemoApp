@@ -42,7 +42,9 @@ static void ssm_parse_publish(sesame * ssm, uint8_t cmd_it_code) {
 static void ssm_parse_response(sesame * ssm, uint8_t cmd_it_code) {
     ssm->c_offset = ssm->c_offset - 1;
     memcpy(ssm->b_buf, ssm->b_buf + 1, ssm->c_offset);
-
+    if (cmd_it_code == SSM_ITEM_CODE_REGISTRATION) {
+        handle_reg_data_from_ssm(ssm);
+    }
     if (cmd_it_code == SSM_ITEM_CODE_LOGIN) {
         ESP_LOGI(TAG, "[%d][ssm][login][ok]", ssm->conn_id);
         ssm->device_status = SSM_LOGGIN;
@@ -54,9 +56,6 @@ static void ssm_parse_response(sesame * ssm, uint8_t cmd_it_code) {
             return;
         }
         send_read_history_cmd_to_ssm(ssm);
-    }
-    if (cmd_it_code == SSM_ITEM_CODE_REGISTRATION) {
-        handle_reg_data_from_ssm(ssm);
     }
 }
 
