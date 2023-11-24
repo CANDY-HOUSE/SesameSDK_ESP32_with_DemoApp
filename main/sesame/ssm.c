@@ -135,11 +135,10 @@ void ssm_mem_deinit(void) {
 }
 
 void ssm_init(ssm_action ssm_action_cb) {
-    p_ssms_env = (struct ssm_env_tag *) malloc(sizeof(struct ssm_env_tag));
+    p_ssms_env = (struct ssm_env_tag *) calloc(1, sizeof(struct ssm_env_tag));
     if (p_ssms_env == NULL) {
         ESP_LOGE(TAG, "[ssm_init][FAIL]");
     }
-    memset(p_ssms_env, 0, sizeof(struct ssm_env_tag));
     p_ssms_env->ssm_cb__ = ssm_action_cb; // callback: ssm_action_handle
     p_ssms_env->ssm.conn_id = 0xFF;       // 0xFF: not connected
     p_ssms_env->ssm.device_status = SSM_NOUSE;
