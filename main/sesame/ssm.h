@@ -1,9 +1,10 @@
-#ifndef __SSM_LINK_H__
-#define __SSM_LINK_H__
+#ifndef __SSM_H__
+#define __SSM_H__
 
 #include "candy.h"
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,10 +26,6 @@ typedef struct {
     SSM_CCM_NONCE decrypt;
 } SesameBleCipher;
 
-union ssm_cipher {
-    SesameBleCipher ssm;
-};
-
 typedef struct mech_status_s {
     uint16_t battery;
     int16_t target;               // 馬達想到的地方
@@ -48,7 +45,7 @@ typedef struct {
     uint8_t device_secret[16];
     uint8_t addr[6];
     volatile uint8_t device_status;
-    union ssm_cipher cipher;
+    SesameBleCipher cipher;
     mech_status_t mech_status;
     uint16_t c_offset;
     uint8_t b_buf[80]; /// max command size is register(80 Bytes).
@@ -70,8 +67,6 @@ void ssm_ble_receiver(sesame * ssm, const uint8_t * p_data, uint16_t len);
 
 void talk_to_ssm(sesame * ssm, uint8_t parsing_type);
 
-void ssm_disconnect(sesame * ssm);
-
 void ssm_mem_deinit(void);
 
 void ssm_init(ssm_action ssm_action_cb);
@@ -80,4 +75,4 @@ void ssm_init(ssm_action ssm_action_cb);
 }
 #endif
 
-#endif // __SSM_LINK_H__
+#endif // __SSM_H__

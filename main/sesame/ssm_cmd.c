@@ -6,9 +6,7 @@
 #include <string.h>
 
 static const char * TAG = "ssm_cmd.c";
-
 static uint8_t tag_esp32[] = { 'S', 'E', 'S', 'A', 'M', 'E', ' ', 'E', 'S', 'P', '3', '2' };
-
 static uint8_t ecc_private_esp32[32];
 
 static int crypto_backend_micro_ecc_rng_callback(uint8_t * dest, unsigned size) {
@@ -32,18 +30,18 @@ void handle_reg_data_from_ssm(sesame * ssm) {
     memcpy(ssm->public_key, &ssm->b_buf[13], 64);
     uint8_t ecdh_secret_ssm[32];
     uECC_shared_secret_lit(ssm->public_key, ecc_private_esp32, ecdh_secret_ssm, uECC_secp256r1());
-    memcpy(ssm->device_secret, ecdh_secret_ssm, 16); // ssm device_secret
+    memcpy(ssm->device_secret, ecdh_secret_ssm, 16);
     // ESP_LOG_BUFFER_HEX("deviceSecret", ssm->device_secret, 16);
-    AES_CMAC(ssm->device_secret, (const unsigned char *) ssm->cipher.ssm.decrypt.random_code, 4, ssm->cipher.ssm.token);
+    AES_CMAC(ssm->device_secret, (const unsigned char *) ssm->cipher.decrypt.random_code, 4, ssm->cipher.token);
     ssm->device_status = SSM_LOGGIN;
     p_ssms_env->ssm_cb__(ssm); // callback: ssm_action_handle() in main.c
 }
 
 void send_login_cmd_to_ssm(sesame * ssm) {
-    ESP_LOGI(TAG, "[ssm][login][->]");
+    ESP_LOGW(TAG, "[esp32->ssm][login]");
     ssm->b_buf[0] = SSM_ITEM_CODE_LOGIN;
-    AES_CMAC(ssm->device_secret, (const unsigned char *) ssm->cipher.ssm.decrypt.random_code, 4, ssm->cipher.ssm.token);
-    memcpy(&ssm->b_buf[1], ssm->cipher.ssm.token, 4);
+    AES_CMAC(ssm->device_secret, (const unsigned char *) ssm->cipher.decrypt.random_code, 4, ssm->cipher.token);
+    memcpy(&ssm->b_buf[1], ssm->cipher.token, 4);
     ssm->c_offset = 5;
     talk_to_ssm(ssm, SSM_SEG_PARSING_TYPE_PLAINTEXT);
 }
@@ -57,11 +55,11 @@ void send_read_history_cmd_to_ssm(sesame * ssm) {
 }
 
 void ssm_lock(uint8_t * tag, uint8_t tag_length) {
-    ESP_LOGI(TAG, "[ssm][ssm_lock][%s]", SSM_STATUS_STR(p_ssms_env->ssm.device_status));
+    // ESP_LOGI(TAG, "[ssm][ssm_lock][%s]", SSM_STATUS_STR(p_ssms_env->ssm.device_status));
     sesame * ssm = &p_ssms_env->ssm;
     if (ssm->device_status >= SSM_LOGGIN) {
         if (tag_length == 0) {
-            tag        = tag_esp32;
+            tag = tag_esp32;
             tag_length = sizeof(tag_esp32);
         }
         ssm->b_buf[0] = SSM_ITEM_CODE_LOCK;
