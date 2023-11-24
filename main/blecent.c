@@ -23,7 +23,7 @@ static int ssm_enable_notify(uint16_t conn_handle) {
         goto err;
     }
     uint8_t value[2] = { 0x01, 0x00 };
-    int rc = ble_gattc_write_flat(conn_handle, dsc->dsc.handle, value, sizeof value, NULL, NULL);
+    int rc = ble_gattc_write_flat(conn_handle, dsc->dsc.handle, value, sizeof(value), NULL, NULL);
     if (rc != 0) {
         ESP_LOGE(TAG, "Error: Failed to subscribe to characteristic; rc=%d\n", rc);
         goto err;
@@ -115,9 +115,8 @@ static void ssm_scan_connect(const struct ble_hs_adv_fields * fields, void * dis
             ESP_LOGI(TAG, "find registered SSM[%d]", fields->mfg_data[2]);
             return;
         }
-    } else { // not SSM
-        // ESP_LOGW(TAG, "not SSM !! ");
-        return;
+    } else {
+        return; // not SSM
     }
     ble_gap_disc_cancel(); /* Scanning must be stopped before a connection can be nitiated. */
     addr = &((struct ble_gap_disc_desc *) disc)->addr;
