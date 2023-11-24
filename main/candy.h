@@ -24,6 +24,7 @@ extern "C" {
          : (code) == SSM_ITEM_CODE_MECH_STATUS           ? "SSM_ITEM_CODE_MECH_STATUS"                                                                                                                                                                        \
          : (code) == SSM_ITEM_CODE_LOCK                  ? "SSM_ITEM_CODE_LOCK"                                                                                                                                                                               \
          : (code) == SSM_ITEM_CODE_UNLOCK                ? "SSM_ITEM_CODE_UNLOCK"                                                                                                                                                                             \
+         : (code) == SSM2_ITEM_OPS_TIMER_SETTING         ? "SSM2_ITEM_OPS_TIMER_SETTING"                                                                                                                                                                      \
                                                          : "UNKNOWN_ITEM_CODE")
 #define SSM_STATUS_STR(status)                                                                                                                                                                                                                                \
     ((status) == SSM_NOUSE              ? "NOUSE"                                                                                                                                                                                                             \
@@ -45,44 +46,45 @@ extern "C" {
 #define SSM_SEG_PARSING_TYPE_CIPHERTEXT (2)
 
 typedef enum {
-    SESAME_5      = 5,
+    SESAME_5 = 5,
     SESAME_BIKE_2 = 6,
-    SESAME_5_PRO  = 7,
+    SESAME_5_PRO = 7,
 } candy_product_type;
 
 typedef enum {
-    SSM_NOUSE        = 0,
+    SSM_NOUSE = 0,
     SSM_DISCONNECTED = 1,
-    SSM_SCANNING     = 2,
-    SSM_CONNECTING   = 3,
-    SSM_CONNECTED    = 4,
-    SSM_LOGGIN       = 5,
-    SSM_LOCKED       = 6,
-    SSM_UNLOCKED     = 7,
-    SSM_MOVED        = 8,
+    SSM_SCANNING = 2,
+    SSM_CONNECTING = 3,
+    SSM_CONNECTED = 4,
+    SSM_LOGGIN = 5,
+    SSM_LOCKED = 6,
+    SSM_UNLOCKED = 7,
+    SSM_MOVED = 8,
 } device_status_t;
 
 typedef enum {
     SSM_OP_CODE_RESPONSE = 0x07,
-    SSM_OP_CODE_PUBLISH  = 0x08,
+    SSM_OP_CODE_PUBLISH = 0x08,
 } ssm_op_code_e;
 
 typedef enum {
-    SSM_ITEM_CODE_NONE                  = 0,
-    SSM_ITEM_CODE_REGISTRATION          = 1,
-    SSM_ITEM_CODE_LOGIN                 = 2,
-    SSM_ITEM_CODE_USER                  = 3,
-    SSM_ITEM_CODE_HISTORY               = 4,
-    SSM_ITEM_CODE_VERSION_DETAIL        = 5,
+    SSM_ITEM_CODE_NONE = 0,
+    SSM_ITEM_CODE_REGISTRATION = 1,
+    SSM_ITEM_CODE_LOGIN = 2,
+    SSM_ITEM_CODE_USER = 3,
+    SSM_ITEM_CODE_HISTORY = 4,
+    SSM_ITEM_CODE_VERSION_DETAIL = 5,
     SSM_ITEM_CODE_DISCONNECT_REBOOT_NOW = 6,
-    SSM_ITEM_CODE_ENABLE_DFU            = 7,
-    SSM_ITEM_CODE_TIME                  = 8,
-    SSM_ITEM_CODE_INITIAL               = 14,
-    SSM_ITEM_CODE_MAGNET                = 17,
-    SSM_ITEM_CODE_MECH_SETTING          = 80,
-    SSM_ITEM_CODE_MECH_STATUS           = 81,
-    SSM_ITEM_CODE_LOCK                  = 82,
-    SSM_ITEM_CODE_UNLOCK                = 83,
+    SSM_ITEM_CODE_ENABLE_DFU = 7,
+    SSM_ITEM_CODE_TIME = 8,
+    SSM_ITEM_CODE_INITIAL = 14,
+    SSM_ITEM_CODE_MAGNET = 17,
+    SSM_ITEM_CODE_MECH_SETTING = 80,
+    SSM_ITEM_CODE_MECH_STATUS = 81,
+    SSM_ITEM_CODE_LOCK = 82,
+    SSM_ITEM_CODE_UNLOCK = 83,
+    SSM2_ITEM_OPS_TIMER_SETTING = 92,
 } ssm_item_code_e;
 
 #ifdef __cplusplus
