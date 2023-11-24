@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __BLECENT_H__
+#define __BLECENT_H__
 
 #include <host/ble_gap.h>
 #include <host/ble_gatt.h>
@@ -16,3 +17,5 @@ void esp_ble_init(void);
 #ifdef __cplusplus
 }
 #endif
+
+#endif // __BLECENT_H__
