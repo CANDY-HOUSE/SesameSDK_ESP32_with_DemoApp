@@ -77,7 +77,7 @@ void ssm_ble_receiver(sesame * ssm, const uint8_t * p_data, uint16_t len) {
 
     uint8_t cmd_op_code = ssm->b_buf[0];
     uint8_t cmd_it_code = ssm->b_buf[1];
-    ssm->c_offset       = ssm->c_offset - 2;
+    ssm->c_offset = ssm->c_offset - 2;
     memcpy(ssm->b_buf, ssm->b_buf + 2, ssm->c_offset);
     ESP_LOGI(TAG, "[ssm][say][%d][%s][%s]", ssm->conn_id, SSM_OP_CODE_STR(cmd_op_code), SSM_ITEM_CODE_STR(cmd_it_code));
     if (cmd_op_code == SSM_OP_CODE_PUBLISH) {
@@ -99,19 +99,19 @@ void talk_to_ssm(sesame * ssm, uint8_t parsing_type) {
         ssm->c_offset = ssm->c_offset + CCM_TAG_LENGTH;
     }
 
-    uint8_t * data    = ssm->b_buf;
-    uint16_t remain   = ssm->c_offset;
-    uint16_t len      = remain;
+    uint8_t * data = ssm->b_buf;
+    uint16_t remain = ssm->c_offset;
+    uint16_t len = remain;
     uint8_t tmp_v[20] = { 0 };
     uint16_t len_l;
 
     while (remain) {
         if (remain <= 19) {
             tmp_v[0] = parsing_type << 1u;
-            len_l    = 1 + remain;
+            len_l = 1 + remain;
         } else {
             tmp_v[0] = 0;
-            len_l    = 20;
+            len_l = 20;
         }
         if (remain == len) {
             tmp_v[0] |= 1u;
@@ -140,8 +140,8 @@ void ssm_init(ssm_action ssm_action_cb) {
         ESP_LOGE(TAG, "[ssm_init][FAIL]");
     }
     memset(p_ssms_env, 0, sizeof(struct ssm_env_tag));
-    p_ssms_env->ssm_cb__          = ssm_action_cb; // callback: ssm_action_handle
-    p_ssms_env->ssm.conn_id       = 0xFF;          // 0xFF: not connected
+    p_ssms_env->ssm_cb__ = ssm_action_cb; // callback: ssm_action_handle
+    p_ssms_env->ssm.conn_id = 0xFF;       // 0xFF: not connected
     p_ssms_env->ssm.device_status = SSM_NOUSE;
     ESP_LOGI(TAG, "[ssm_init][SUCCESS]");
 }

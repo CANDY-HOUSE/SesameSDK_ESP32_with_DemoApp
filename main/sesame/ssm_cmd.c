@@ -40,7 +40,7 @@ void handle_reg_data_from_ssm(sesame * ssm) {
 }
 
 void send_login_cmd_to_ssm(sesame * ssm) {
-    ESP_LOGI(TAG, "[ssm][login][->]");
+    ESP_LOGW(TAG, "[esp32->ssm][login]");
     ssm->b_buf[0] = SSM_ITEM_CODE_LOGIN;
     AES_CMAC(ssm->device_secret, (const unsigned char *) ssm->cipher.ssm.decrypt.random_code, 4, ssm->cipher.ssm.token);
     memcpy(&ssm->b_buf[1], ssm->cipher.ssm.token, 4);
@@ -61,7 +61,7 @@ void ssm_lock(uint8_t * tag, uint8_t tag_length) {
     sesame * ssm = &p_ssms_env->ssm;
     if (ssm->device_status >= SSM_LOGGIN) {
         if (tag_length == 0) {
-            tag        = tag_esp32;
+            tag = tag_esp32;
             tag_length = sizeof(tag_esp32);
         }
         ssm->b_buf[0] = SSM_ITEM_CODE_LOCK;

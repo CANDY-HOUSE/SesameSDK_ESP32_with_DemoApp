@@ -37,7 +37,7 @@ static int ssm_enable_notify(uint16_t conn_handle) {
     // ESP_LOGI(TAG, "[conn_handle:%d][notify_handle:%d]", conn_handle, dsc->dsc.handle);
     value[0] = 1;
     value[1] = 0;
-    int rc   = ble_gattc_write_flat(conn_handle, dsc->dsc.handle, value, sizeof value, NULL, NULL);
+    int rc = ble_gattc_write_flat(conn_handle, dsc->dsc.handle, value, sizeof value, NULL, NULL);
     if (rc != 0) {
         ESP_LOGE(TAG,
                  "Error: Failed to subscribe to characteristic; "
@@ -80,8 +80,8 @@ static int ble_gap_event_connect_handle(struct ble_gap_event * event, struct ble
         ESP_LOGE(TAG, "Failed to add peer; rc=%d\n", rc);
         return ESP_FAIL;
     }
-    p_ssms_env->ssm.device_status = SSM_CONNECTED;              // set the device status
-    p_ssms_env->ssm.conn_id       = event->connect.conn_handle; // save the connection handle
+    p_ssms_env->ssm.device_status = SSM_CONNECTED;        // set the device status
+    p_ssms_env->ssm.conn_id = event->connect.conn_handle; // save the connection handle
     ESP_LOGW(TAG, "Connect SSM success handle=%d", event->connect.conn_handle);
     rc = peer_disc_all(event->connect.conn_handle, blecent_on_service_disc_complete, NULL);
     if (rc != 0) {
@@ -139,7 +139,7 @@ static int ble_gap_connect_event(struct ble_gap_event * event, void * arg) {
 
 static void ssm_scan_connect(const struct ble_hs_adv_fields * fields, void * disc) {
     ble_addr_t * addr = &((struct ble_gap_disc_desc *) disc)->addr;
-    int8_t rssi       = ((struct ble_gap_disc_desc *) disc)->rssi;
+    int8_t rssi = ((struct ble_gap_disc_desc *) disc)->rssi;
     if (rssi < -60) { // RSSI threshold
         return;
     }
@@ -149,7 +149,7 @@ static void ssm_scan_connect(const struct ble_hs_adv_fields * fields, void * dis
             if (p_ssms_env->ssm.device_status == SSM_NOUSE) {
                 memcpy(p_ssms_env->ssm.addr, addr->val, 6);
                 p_ssms_env->ssm.device_status = SSM_DISCONNECTED;
-                p_ssms_env->ssm.conn_id       = 0xFF;
+                p_ssms_env->ssm.conn_id = 0xFF;
             }
         } else { // registered SSM
             ESP_LOGI(TAG, "find registered SSM[%d]", fields->mfg_data[2]);
@@ -184,12 +184,12 @@ static void blecent_scan(void) {
     ESP_LOGI(TAG, "[blecent_scan][START]");
     struct ble_gap_disc_params disc_params;
     disc_params.filter_duplicates = 1;
-    disc_params.passive           = 1;
-    disc_params.itvl              = 0;
-    disc_params.window            = 0;
-    disc_params.filter_policy     = 0;
-    disc_params.limited           = 0;
-    int rc                        = ble_gap_disc(BLE_OWN_ADDR_PUBLIC, BLE_HS_FOREVER, &disc_params, ble_adv_scan_event, NULL);
+    disc_params.passive = 1;
+    disc_params.itvl = 0;
+    disc_params.window = 0;
+    disc_params.filter_policy = 0;
+    disc_params.limited = 0;
+    int rc = ble_gap_disc(BLE_OWN_ADDR_PUBLIC, BLE_HS_FOREVER, &disc_params, ble_adv_scan_event, NULL);
     if (rc != 0) {
         ESP_LOGE(TAG, "Error initiating GAP discovery procedure; rc=0x%x\n", rc);
     }
@@ -205,7 +205,7 @@ void esp_ble_gatt_write(sesame * ssm, uint8_t * value, uint16_t length) {
     const struct peer_chr * chr;
     const struct peer * peer;
     peer = peer_find(ssm->conn_id);
-    chr  = peer_chr_find_uuid(peer, sesame_svc_uuid, sesame_chr_uuid);
+    chr = peer_chr_find_uuid(peer, sesame_svc_uuid, sesame_chr_uuid);
     if (chr == NULL) {
         ESP_LOGE(TAG, "Error: Peer doesn't have the subscribable characteristic\n");
         return;
@@ -226,7 +226,7 @@ void esp_ble_init(void) {
         return;
     }
     ble_hs_cfg.sync_cb = blecent_scan;
-    int rc             = peer_init(SSM_MAX_NUM, 64, 64, 64);
+    int rc = peer_init(SSM_MAX_NUM, 64, 64, 64);
     assert(rc == 0);
     nimble_port_freertos_init(blecent_host_task);
     ESP_LOGI(TAG, "[esp_ble_init][SUCCESS]");
