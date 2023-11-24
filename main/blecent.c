@@ -137,7 +137,7 @@ static int ble_gap_connect_event(struct ble_gap_event * event, void * arg) {
     }
 }
 
-static void blecent_connect_sesame(const struct ble_hs_adv_fields * fields, void * disc) {
+static void ssm_scan_connect(const struct ble_hs_adv_fields * fields, void * disc) {
     ble_addr_t * addr = &((struct ble_gap_disc_desc *) disc)->addr;
     int8_t rssi       = ((struct ble_gap_disc_desc *) disc)->rssi;
     if (rssi < -60) { // RSSI threshold
@@ -176,7 +176,7 @@ static int ble_gap_disc_event(struct ble_gap_event * event, void * arg) {
     if (rc != 0) {
         return ESP_FAIL;
     }
-    blecent_connect_sesame(&fields, &event->disc);
+    ssm_scan_connect(&fields, &event->disc);
     return ESP_OK;
 }
 
