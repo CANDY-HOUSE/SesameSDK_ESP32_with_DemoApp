@@ -1,3 +1,4 @@
+![img](./doc/resources/SesameSDK_20231201.png)
 # ESP32-C3-DevKitM-1 Sesame5 Switch Control Example
 
 This project demonstrates how to use the ESP32-C3-DevKitM-1 microcontroller to register and control a Sesame5 smart lock. Utilizing the ESP-IDF development framework and BLE technology, this example automatically searches for, connects to, and registers nearby Sesame5 devices. When the ESP32-C3-DevKitM-1 detects that the Sesame5 is in the unlock position, it issues a command to automatically lock it.
