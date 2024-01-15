@@ -116,7 +116,7 @@ static void ssm_scan_connect(const struct ble_hs_adv_fields * fields, void * dis
     if (((struct ble_gap_disc_desc *) disc)->rssi < -60) { // RSSI threshold
         return;
     }
-    if (fields->mfg_data[0] == 0x5A && fields->mfg_data[1] == 0x05) { // is SSM
+    if (fields->mfg_data_len >= 5 && fields->mfg_data[0] == 0x5A && fields->mfg_data[1] == 0x05) { // is SSM
         if (fields->mfg_data[4] == 0x00) {                            // unregistered SSM
             ESP_LOGW(TAG, "find unregistered SSM[%d]", fields->mfg_data[2]);
             if (p_ssms_env->ssm.device_status == SSM_NOUSE) {
