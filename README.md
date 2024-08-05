@@ -1,4 +1,4 @@
-![img](./doc/resources/SesameSDK_20231201.png)
+![SesameSDK](https://github.com/CANDY-HOUSE/.github/blob/main/profile/images/SesameSDK.png?raw=true)
 # ESP32-C3-DevKitM-1 Sesame5 開關控制範例
 
 這個專案展示了如何使用 ESP32-C3-DevKitM-1 微控制器來註冊和控制 Sesame5 智能鎖。本範例使用 ESP-IDF 開發框架，透過 BLE 技術自動尋找、連接並註冊附近的 Sesame5 設備。當 ESP32-C3-DevKitM-1 偵測到 Sesame5 達到開鎖位置時，會發出指令自動上鎖。
