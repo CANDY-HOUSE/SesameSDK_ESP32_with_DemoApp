@@ -60,6 +60,19 @@ static int ble_gap_event_connect_handle(struct ble_gap_event * event) {
         ESP_LOGE(TAG, "Failed to add peer; rc=%d\n", rc);
         return ESP_FAIL;
     }
+
+    // if the sesame device is Sesame Touch / Touch Pro, we need to set the MTU to 251
+    #ifdef CONFIG_SESAME_TOUCH
+        rc = ble_att_set_preferred_mtu(251);
+        if (rc != ESP_OK) {
+            return ESP_FAIL;
+        }
+        rc = ble_gattc_exchange_mtu(event->connect.conn_handle, NULL, NULL);
+        if (rc != ESP_OK) {
+            return ESP_FAIL;
+        }
+    #endif
+
     p_ssms_env->ssm.device_status = SSM_CONNECTED;        // set the device status
     p_ssms_env->ssm.conn_id = event->connect.conn_handle; // save the connection handle
     ESP_LOGW(TAG, "Connect SSM success handle=%d", p_ssms_env->ssm.conn_id);
@@ -117,7 +130,7 @@ static void ssm_scan_connect(const struct ble_hs_adv_fields * fields, void * dis
         return;
     }
     if (fields->mfg_data_len >= 5 && fields->mfg_data[0] == 0x5A && fields->mfg_data[1] == 0x05) { // is SSM
-        if (fields->mfg_data[4] == 0x00) {                            // unregistered SSM
+        if (fields->mfg_data[4] == 0x00) {                                                         // unregistered SSM
             ESP_LOGW(TAG, "find unregistered SSM[%d]", fields->mfg_data[2]);
             if (p_ssms_env->ssm.device_status == SSM_NOUSE) {
                 memcpy(p_ssms_env->ssm.addr, addr->val, 6);
